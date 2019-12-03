@@ -136,17 +136,15 @@ def test_find_temporal_mean():
 
 """def create_parser(args):
         parser = argparse.ArgumentParser(description='prints given arguments')
-        parser.add_argument('-a', help='first argument to print', dest='a')
+        parser.add_argument('-a', help='first argument to print')
 
         args = parser.parse_args(args)
 
-        if args.a:
-                print(args['a'])
-
 
 def test_arg_parser():
-        parser = create_parser(['hi'])
-        assertEqual(parser, 'hi')"""
+        parser = create_parser('-a hi'.split())
+        assertEqual(parser, 'a=hi')"""
+
 
 def test_open_multiple_files():
 	pattern = '/badc/cmip5/data/cmip5/output1/{model}/historical/mon/land/Lmon/{ensemble}/latest/{var_id}/*.nc'
