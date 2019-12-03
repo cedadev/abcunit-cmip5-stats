@@ -82,10 +82,20 @@ def test_xarray_open_time_dimension():
         time = ds.sel(lat=0, lon=0)
         
 
-def test_slice_a_time_range():
+def test_slice_a_time_range_incorrect_shape():
 	fpath = '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/mon/land/Lmon/r1i1p1/latest/rh/rh_Lmon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc'
         ds = xr.open_dataset(fpath)
 	time_slice = ds.time.loc['1900-01-01':'2000-01-01']
+	#return time_slice
+	print('time_slice_shape =', time_slice.shape)
+
+
+def test_slice_a_time_range_correct_shape():
+        fpath = '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/mon/land/Lmon/r1i1p1/latest/rh/rh_Lmon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc'
+        ds = xr.open_dataset(fpath)
+        time_slice = ds.sel(time=slice('1934-12-01', '1939-12-01'))
+        return time_slice
+        #print('time_slice_shape_2 =', time_slice.rh.shape)
 
 
 def test_find_temporal_max_incorrect_shape():
@@ -154,3 +164,10 @@ def test_max_multiple_files():
 	print('max_multiple =', maximum)
 	print('max_multiple shape =', maximum.shape)
 
+
+def test_max_of_time_slice():
+	time_slice = test_slice_a_time_range_correct_shape()
+	print('time_slice_shape =', time_slice.rh.shape)
+	maximum = time_slice.rh.max(dim='time')
+	print('max =', maximum)
+        print('max shape =', maximum.shape)
