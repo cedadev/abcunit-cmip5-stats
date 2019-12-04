@@ -1,7 +1,10 @@
+import sys
+
 from lib import defaults
 import glob
 import xarray as xr
 import argparse
+import run_batch
 
 
 def arg_parse_all():
@@ -18,8 +21,21 @@ def arg_parse_all():
     return parser.parse_args()
 
 
+def loop_over_arguments(args):
+    i=0
+    while i < len(args.model):
+        for j in args.model:
+            print(f"Running for {j}")
+            sys.argv = f'run_batch.py -s {args.stat} -m {j} -e {args.ensemble} -v {args.var}'.split()
+            return sys.argv
+        i+=1
+
+
 def main():
-    args = arg_parse_chunk()
+    args = arg_parse_all()
+    print(f"Finding {args.stat} of {args.var} for {args.model}, {args.ensemble}.")
+    loop_over_arguments(args)
+
 
 
 if __name__ == '__main__':

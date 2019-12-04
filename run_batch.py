@@ -18,8 +18,13 @@ def arg_parse_batch():
     return parser.parse_args()
 
 
+#check validity of date range needed?
+
+
+
 def main():
-    args = arg_parse_chunk()
+    arg_parse_chunk()
+    
 
 
 if __name__ == '__main__':

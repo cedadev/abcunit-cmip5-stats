@@ -3,7 +3,7 @@ import glob
 import xarray as xr
 import argparse
 
-
+#parse command line and check all arguments are valid
 def arg_parse_chunk():
     parser = argparse.ArgumentParser()
     stat_choices = ['min', 'max', 'mean']
@@ -17,7 +17,7 @@ def arg_parse_chunk():
     parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices, help=f'Variable to run statistic on, can be one or many of: {variable_choices}. Default is all variables.', metavar='')
     return parser.parse_args()
 
-
+#loop over unit
 
 def main():
     args = arg_parse_chunk()
