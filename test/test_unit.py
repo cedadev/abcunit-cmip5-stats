@@ -22,7 +22,7 @@ def test_xarray_open_good_path_success():
 def test_create_and_save_netcdf_file_bad_dimension_length():
     try:
         ds = xr.Dataset({'test': (('x', 'y'), np.random.rand(4,4))},
-                        coords={'x': [1,2,3, 4],
+                        coords={'x': [1,2,3,4],
                                 'y': [1,2,3,4]})
         ds.to_netcdf('example_dataset.nc')
     except ValueError as exc:
@@ -105,6 +105,7 @@ def test_find_temporal_max_incorrect_shape():
         maximum = ds.max(dim='time')
         print('max =', maximum)
         print('max shape =', maximum.shape)
+        assert()
 
     except AttributeError as exc:
         pass
