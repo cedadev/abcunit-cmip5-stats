@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import argparse
 import glob
+import pytest
+import os
 
 
 def test_xarray_open_bad_path_fail():
@@ -19,22 +21,28 @@ def test_xarray_open_good_path_success():
     ds = xr.open_dataset(fpath)
 
 
-def test_create_and_save_netcdf_file_bad_dimension_length():
+def test_create_and_save_netcdf_file_bad_dimension_length(tmpdir):
     try:
+        tmpdir.mkdir("test_dir").join("example_dataset.nc")
         ds = xr.Dataset({'test': (('x', 'y'), np.random.rand(4,4))},
                         coords={'x': [1,2,3,4],
                                 'y': [1,2,3,4]})
-        ds.to_netcdf('example_dataset.nc')
+        ds.close()
+        ds.to_netcdf(path='test_dir/example_dataset.nc')
+
     except ValueError as exc:
         pass
 
 
-def test_create_and_save_netcdf_file_input_as_dates():
+def test_create_and_save_netcdf_file_input_as_dates(tmpdir):
+
+    tmpdir.mkdir("test_dir").join("example_dataset_1.nc")
     ds = xr.Dataset({'test': (('x', 'y', 't'), np.random.rand(4,4,5))},
                     coords={'x': [1,2,3, 4],
                             'y': [1,2,3,4],
                             't': pd.date_range('1990-02-01', periods=5, dtype='datetime64[ns]', freq='M')})
-    ds.to_netcdf('example_dataset_1.nc')
+    ds.close()
+    ds.to_netcdf(path="test_dir/example_dataset_1.nc")
 
 
 def test_create_and_save_netcdf_file_correct_dimension_length():
@@ -43,7 +51,7 @@ def test_create_and_save_netcdf_file_correct_dimension_length():
                             'y': [1,2,3,4],
                             'z': [1,2,3,4,5]})
 
-    ds.to_netcdf('example_dataset_2.nc')
+    #ds.to_netcdf('example_dataset_2.nc')
 
 
 def test_xarray_open_time_dimension_fail():
@@ -105,7 +113,6 @@ def test_find_temporal_max_incorrect_shape():
         maximum = ds.max(dim='time')
         print('max =', maximum)
         print('max shape =', maximum.shape)
-        assert()
 
     except AttributeError as exc:
         pass
