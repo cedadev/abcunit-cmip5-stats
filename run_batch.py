@@ -2,8 +2,9 @@ from lib import defaults
 import glob
 import xarray as xr
 import argparse
+import os
 
-
+#parse command line
 def arg_parse_batch():
     parser = argparse.ArgumentParser()
     stat_choices = ['min', 'max', 'mean']
@@ -18,13 +19,35 @@ def arg_parse_batch():
     return parser.parse_args()
 
 
-#check validity of date range needed?
+#for each ensemble submit run_chunk to lotus
+def loop_over_ensembles(args):
+    current_directory = os.getcwd()
+    #iterate over each ensemble
+    for i in args.ensemble:
+        print(f"Running for {i}")
+        arg_list = argparse.Namespace(ensemble=[i], model=[args.model], stat=[args.stat], var=[args.var])
+        run_batch.get_arguments(arg_list)
+        
+        #make output directory
+        output_dir = f"{current_directory}/lotus_outputs/{args.stat}/{args.model}/"
+        os.mkdir(output_dir)
+        output_base = f"{output_dir}/{args.ensemble}"
+        
+        #submit to lotus
+        bsub_command = f"bsub -q {defaults.queue} -W {defaults.wallclock} -o {output_base}.out -e {output_base}.err {current_directory}/run_chunk.py -s {arg.stat} -m {args.model} -e {i} -v {args.var}"
+        os.system(bsub_command)
+        print(f"running {bsub_command}")
 
+
+#if run from run_all
+def get_arguments(arg_list):
+    loop_over_ensembles(arg_list)
 
 
 def main():
-    arg_parse_chunk()
-    
+    args = arg_parse_batch()
+    loop_over_ensembles(args)
+
 
 
 if __name__ == '__main__':

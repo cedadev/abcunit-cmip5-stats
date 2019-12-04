@@ -21,14 +21,13 @@ def arg_parse_all():
     return parser.parse_args()
 
 
-def loop_over_arguments(args):
-    i=0
-    while i < len(args.model):
-        for j in args.model:
-            print(f"Running for {j}")
-            sys.argv = f'run_batch.py -s {args.stat} -m {j} -e {args.ensemble} -v {args.var}'.split()
-            return sys.argv
-        i+=1
+#run run_batch for each of the models listed
+def loop_over_models(args):
+    #iterate over models 
+    for i in args.model:
+        print(f"Running for {i}")
+        arg_list = argparse.Namespace(ensemble=[args.ensemble], model=[i], stat=[args.stat], var=[args.var])
+        run_batch.get_arguments(arg_list)
 
 
 def main():

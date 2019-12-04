@@ -18,9 +18,22 @@ def arg_parse_chunk():
     return parser.parse_args()
 
 #loop over unit
+def loop_over_variables(args):
+    #iterate over variables 
+    for i in args.var:
+        arg_list = argparse.Namespace(ensemble=[args.ensemble], model=[args.model], stat=[args.stat], var=[i])
+        run_unit(arg_list)
+
+def run_unit(args):
+    #define paths as absolute paths
+    output_file_path =
+    success_file_path =
+    failure_file_path =
 
 def main():
     args = arg_parse_chunk()
+    loop_over_variables(args)
+
     
 
 if __name__ == '__main__':
