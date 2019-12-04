@@ -27,7 +27,6 @@ def test_create_and_save_netcdf_file_bad_dimension_length(tmpdir):
         ds = xr.Dataset({'test': (('x', 'y'), np.random.rand(4,4))},
                         coords={'x': [1,2,3,4],
                                 'y': [1,2,3,4]})
-        ds.close()
         ds.to_netcdf(path='test_dir/example_dataset.nc')
 
     except ValueError as exc:
@@ -41,7 +40,6 @@ def test_create_and_save_netcdf_file_input_as_dates(tmpdir):
                     coords={'x': [1,2,3, 4],
                             'y': [1,2,3,4],
                             't': pd.date_range('1990-02-01', periods=5, dtype='datetime64[ns]', freq='M')})
-    ds.close()
     ds.to_netcdf(path="test_dir/example_dataset_1.nc")
 
 
@@ -176,3 +174,5 @@ def test_max_of_time_slice():
     maximum = time_slice.rh.max(dim='time')
     print('max =', maximum)
     print('max shape =', maximum.shape)
+
+# do assert instead of print from now on
