@@ -1,13 +1,19 @@
-import sys
+"""This script takes arguments from the command line and runs the script run_batch
+for each of the models provided as an argument or for all models if none were
+provided"""
+
+#import sys
+#import glob
+#import xarray as xr
+import argparse
+import subprocess
+import os
 
 from lib import defaults
-import glob
-import xarray as xr
-import argparse
-import run_batch
 
 
 def arg_parse_all():
+    """Parses arguments given at the command line"""
     parser = argparse.ArgumentParser()
     stat_choices = ['min', 'max', 'mean']
     model_choices = defaults.models
@@ -15,27 +21,39 @@ def arg_parse_all():
     variable_choices = defaults.variables
     parser.add_argument('-s', '--stat', nargs=1, type=str, choices=stat_choices, required=True,
                         help=f'Type of statistic, must be one of: {stat_choices}', metavar='')
-    parser.add_argument('-m', '--model', type=str, default=model_choices, help=f'Institue and model combination to run statistic on, can be one or many of: {model_choices}. Default is all models.', metavar='')
-    parser.add_argument('-e', '--ensemble', type=str, default=ensemble_choices, help=f'Ensemble to run statistic on, can be one or many of: {ensemble_choices}. Default is all ensembles.', metavar='')
-    parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices, help=f'Variable to run statistic on, can be one or many of: {variable_choices}. Default is all variables.', metavar='')
+    parser.add_argument('-m', '--model', type=str, default=model_choices,
+                        help=f'Institue and model combination to run statistic on, '
+                             f'can be one or many of: {model_choices}. '
+                             f'Default is all models.', metavar='')
+    parser.add_argument('-e', '--ensemble', type=str, default=ensemble_choices,
+                        help=f'Ensemble to run statistic on, can be one or many of: '
+                             f'{ensemble_choices}. Default is all ensembles.', metavar='')
+    parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices,
+                        help=f'Variable to run statistic on, can be one or many of: '
+                             f'{variable_choices}. Default is all variables.', metavar='')
     return parser.parse_args()
 
 
-#run run_batch for each of the models listed
 def loop_over_models(args):
-    #iterate over models 
+    """Runs run batch for each of the models listed"""
+    current_directory = os.getcwd()
+    #iterate over models
     for i in args.model:
         print(f"Running for {i}")
-        arg_list = argparse.Namespace(ensemble=[args.ensemble], model=[i], stat=[args.stat], var=[args.var])
-        run_batch.get_arguments(arg_list)
+        #calls run_batch from command line
+        cmd = f"{current_directory}/run_batch.py -s {args.stat} -m {i} -e " \
+              f"{args.ensemble} -v {args.var}"
+        subprocess.call(cmd, shell=True)
 
 
 def main():
+    """Runs script if called on command line"""
     args = arg_parse_all()
     print(f"Finding {args.stat} of {args.var} for {args.model}, {args.ensemble}.")
-    loop_over_arguments(args)
+    #loop_over_models(args)
 
 
 
 if __name__ == '__main__':
     main()
+    
