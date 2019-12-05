@@ -1,4 +1,5 @@
 import sys
+import xarray as xr
 
 from lib import defaults
 from run_all import arg_parse_all
@@ -101,3 +102,15 @@ def test_arg_parse_chunk_3():
     sys.argv = 'run_chunk.py -s min -m BCC/bcc-csm1-1 -e r11i1p1'.split()
     args = arg_parse_chunk()
     assert args.var == defaults.variables
+
+
+# test converting from string
+def test_arg_parse_return():
+        sys.argv = 'run_chunk.py -s min -m MOHC/HadGEM2-ES -e r11i1p1 -v rh'.split()
+        fpath = '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/mon/land/Lmon' \
+                '/r1i1p1/latest/rh/rh_Lmon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc'
+        ds = xr.open_dataset(fpath)
+        args = arg_parse_chunk()
+        var_id = args.var
+        minimum = ds[var_id].min(dim='time')
+        assert minimum.shape == (145, 192)

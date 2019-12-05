@@ -1,7 +1,7 @@
 import glob
 import xarray as xr
 import numpy as np
-import pandas as pd
+
 
 
 def test_xarray_open_bad_path_fail():
