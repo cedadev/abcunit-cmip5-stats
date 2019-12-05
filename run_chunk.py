@@ -9,7 +9,7 @@ import xarray as xr
 
 from lib import defaults
 
-# parse command line and check all arguments are valid
+
 def arg_parse_chunk():
     """Parses arguments given at the command line"""
     parser = argparse.ArgumentParser()
@@ -103,22 +103,29 @@ def run_unit(args):
     failure_count = 0
 
     for i in args.var:
-        #exit if too many failurez
+        # exit if too many failurez
         if failure_count >= defaults.exit_after_n_failures:
             print('Maximum failure count met')
             sys.exit(1)
 
-        #check for success file - if exists - continue
-
-        #delete previous failure files
-
-        #get file paths
+        # get file paths
         file_paths = define_file_paths(args)
 
-        #find files
+        # check for success file - if exists - continue
+        success_path = f'{file_paths[1]}/{i}'
+        if os.path.exists(success_path):
+            print(f'Already ran for {args.stat}, {args.model}, {args.ensemble}, {i}.'
+                  'Success file found')
+            continue
+
+        # delete previous failure files
+
+
+
+        # find files
         nc_files = find_files(args)
 
-        #check data is valid
+        # check data is valid
         if nc_files == False:
             if not os.path.exists(file_paths[2]):
                 os.makedirs(file_paths[2])
@@ -126,7 +133,7 @@ def run_unit(args):
             failure_count += 1
             continue
 
-        #check date range is valid
+        # check date range is valid
         validity = is_valid_range(nc_files)
         if validity == False:
             if not os.path.exists(file_paths[3]):
@@ -135,7 +142,7 @@ def run_unit(args):
             failure_count += 1
             continue
 
-        #calculate the statistic
+        # calculate the statistic
         stat = calculate_statistic(nc_files, args)
         output_file = stat.to_netcdf(f'{args.var}.nc')
         if not os.path.exists(file_paths[0]):
@@ -146,28 +153,13 @@ def run_unit(args):
             print(f'Failed to generate output file: {file_paths[0]}/{args.var}.nc')
             continue
 
-        #create success file
+        # create success file
         if not os.path.exists(file_paths[1]):
             os.makedirs(file_paths[1])
         os.path.join(file_paths[1], i)
 
+    print("Completed job")
 
-
-
-
-
-
-
-
-
-    # call other functions - add to failure count if needed & create failure files, write to output file
-    # if fails - add to failure count
-    # if succeeds - write success file
-
-# exit if too many failures
-# check for success file
-# delete previous failure files
-# files are named after their variables
 
 def main():
     """Runs script if called on command line"""
