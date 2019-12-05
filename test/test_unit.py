@@ -23,33 +23,44 @@ def test_xarray_open_good_path_success():
 
 def test_create_and_save_netcdf_file_bad_dimension_length(tmpdir):
     try:
-        tmpdir.mkdir("test_dir").join("example_dataset.nc")
         ds = xr.Dataset({'test': (('x', 'y'), np.random.rand(4,4))},
                         coords={'x': [1,2,3,4],
                                 'y': [1,2,3,4]})
-        ds.to_netcdf(path='test_dir/example_dataset.nc')
+        ds.to_netcdf(path=tmpdir.mkdir("test_dir").join("example_dataset.nc"))
 
     except ValueError as exc:
         pass
 
 
 def test_create_and_save_netcdf_file_input_as_dates(tmpdir):
+    try:
+        tmpdir.mkdir("test_dir").join("example_dataset_1.nc")
+        ds = xr.Dataset({'test': (('x', 'y', 't'), np.random.rand(4,4,5))},
+                        coords={'x': [1,2,3, 4],
+                                'y': [1,2,3,4],
+                                't': pd.date_range('1990-02-01', periods=5, dtype='datetime64[ns]', freq='M')})
+        ds.to_netcdf(path="test_dir/example_dataset_1.nc")
 
-    tmpdir.mkdir("test_dir").join("example_dataset_1.nc")
+    except PermissionError as exc:
+        pass
+
+
+def test_create_and_save_netcdf_file_input_as_dates_2(tmpdir):
     ds = xr.Dataset({'test': (('x', 'y', 't'), np.random.rand(4,4,5))},
                     coords={'x': [1,2,3, 4],
                             'y': [1,2,3,4],
                             't': pd.date_range('1990-02-01', periods=5, dtype='datetime64[ns]', freq='M')})
-    ds.to_netcdf(path="test_dir/example_dataset_1.nc")
+    ds.to_netcdf(path=tmpdir.mkdir("test_dir").join("example_dataset_1.nc"))
 
 
-def test_create_and_save_netcdf_file_correct_dimension_length():
+
+def test_create_and_save_netcdf_file_correct_dimension_length(tmpdir):
     ds = xr.Dataset({'test': (('x', 'y', 'z'), np.random.rand(4,4,5))},
                     coords={'x': [1,2,3,4],
                             'y': [1,2,3,4],
                             'z': [1,2,3,4,5]})
 
-    #ds.to_netcdf('example_dataset_2.nc')
+    ds.to_netcdf(path=tmpdir.mkdir("test_dir").join("example_dataset_2.nc"))
 
 
 def test_xarray_open_time_dimension_fail():
