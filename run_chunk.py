@@ -2,6 +2,7 @@
 run_unit for each of the variables provided as an argument or for
 all variables if none were provided."""
 
+import sys
 import glob
 import argparse
 import xarray as xr
@@ -29,15 +30,6 @@ def arg_parse_chunk():
                         help=f'Variable to run statistic on, can be one or many of: '
                              f'{variable_choices}. Default is all variables.', metavar='')
     return parser.parse_args()
-
-
-def loop_over_variables(args):
-    """Runs the function run_unit for each of the variables listed"""
-    # iterate over variables
-    for i in args.var:
-        arg_list = argparse.Namespace(ensemble=[args.ensemble], model=[args.model],
-                                      stat=[args.stat], var=[i])
-        # run_unit(arg_list)
 
 
 def define_file_paths(args):
@@ -74,7 +66,7 @@ def is_valid_range(nc_files, start='1900-01-01', end='2000-01-01'):
         times_in_range = ds.time.loc[start:end]
 
         n_req_times = 100 * 12 # yrs * months
-        assert(len(times_in_range) == n_req_times)
+        assert len(times_in_range) == n_req_times
 
         print('[INFO] Range is valid')
         return True
@@ -100,13 +92,74 @@ def calculate_statistic(nc_files, args):
         minimum = dataset[var_id].max(dim='time')
         return minimum
 
+
 def run_unit(args):
-    """Keeps track of whether the job was successful or not and writes the
+    """Loops over each variable listed to calculate the statistic.
+    Keeps track of whether the job was successful or not and writes the
     result of the statistic to an output file."""
-    # keep track of failures. MAny failures expected for this example so
+    # keep track of failures. Many failures expected for this example so the
     # limit is set to -1.
     # good practice to include this
     failure_count = 0
+
+    for i in args.var:
+        #exit if too many failurez
+        if failure_count >= defaults.exit_after_n_failures:
+            print('Maximum failure count met')
+            sys.exit(1)
+
+        #check for success file - if exists - continue
+
+        #delete previous failure files
+
+        #get file paths
+        file_paths = define_file_paths(args)
+
+        #find files
+        nc_files = find_files(args)
+
+        #check data is valid
+        if nc_files == False:
+            if not os.path.exists(file_paths[2]):
+                os.makedirs(file_paths[2])
+            os.path.join(file_paths[2], i)
+            failure_count += 1
+            continue
+
+        #check date range is valid
+        validity = is_valid_range(nc_files)
+        if validity == False:
+            if not os.path.exists(file_paths[3]):
+                os.makedirs(file_paths[3])
+            os.path.join(file_paths[3], i)
+            failure_count += 1
+            continue
+
+        #calculate the statistic
+        stat = calculate_statistic(nc_files, args)
+        output_file = stat.to_netcdf(f'{args.var}.nc')
+        if not os.path.exists(file_paths[0]):
+            os.makedirs(file_paths[0])
+        output_path = os.path.join(file_paths[3], output_file)
+        if not os.path.exists(output_path):
+            failure_count += 1
+            print(f'Failed to generate output file: {file_paths[0]}/{args.var}.nc')
+            continue
+
+        #create success file
+        if not os.path.exists(file_paths[1]):
+            os.makedirs(file_paths[1])
+        os.path.join(file_paths[1], i)
+
+
+
+
+
+
+
+
+
+
     # call other functions - add to failure count if needed & create failure files, write to output file
     # if fails - add to failure count
     # if succeeds - write success file
@@ -114,14 +167,12 @@ def run_unit(args):
 # exit if too many failures
 # check for success file
 # delete previous failure files
-# files aree named after their variables
+# files are named after their variables
 
 def main():
     """Runs script if called on command line"""
     args = arg_parse_chunk()
-    loop_over_variables(args)
-
-
+    run_unit(args)
 
 if __name__ == '__main__':
     main()

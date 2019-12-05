@@ -43,7 +43,7 @@ def loop_over_ensembles(args):
 
         #make output directory
         output_dir = f"{current_directory}/lotus_outputs/{args.stat}/{args.model}/"
-        os.mkdir(output_dir)
+        os.makedirs(output_dir)
         output_base = f"{output_dir}/{args.ensemble}"
 
         #submit to lotus
