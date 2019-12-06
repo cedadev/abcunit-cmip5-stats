@@ -33,13 +33,3 @@ variables = ['baresoilFrac', 'burntArea', 'c3PftFrac', 'c4PftFrac', 'cCwd', 'cLe
              'mrsos', 'nbp', 'nep', 'npp', 'nppLeaf', 'nppRoot', 'nppWood', 'pastureFrac', 'prveg',
              'rGrowth', 'rMaint', 'ra', 'residualFrac', 'rh', 'shrubFrac', 'tran', 'treeFrac',
              'treeFracPrimDec', 'treeFracPrimEver', 'treeFracSecDec', 'treeFracSecEver', 'tsl']
-
-exit_after_n_failures = -1
-
-start_date = '1900-01-01'
-
-end_date = '2000-01-01'
-
-queue = 'short-serial'
-
-wallclock = '00:10'

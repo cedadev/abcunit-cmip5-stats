@@ -114,3 +114,4 @@ def test_arg_parse_return():
         var_id = args.var
         minimum = ds[var_id].min(dim='time')
         assert minimum.shape == (145, 192)
+

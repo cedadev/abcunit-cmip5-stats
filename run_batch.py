@@ -9,6 +9,7 @@ import os
 import subprocess
 
 from lib import defaults
+import SETTINGS
 
 
 def arg_parse_batch():
@@ -38,18 +39,18 @@ def loop_over_ensembles(args):
     """Submits run_chunk to lotus for each of the ensembles listed"""
     current_directory = os.getcwd()
     #iterate over each ensemble
-    for i in args.ensemble:
-        print(f"Running for {i}")
+    for ensemble in args.ensemble:
+        print(f"Running for {ensemble}")
 
         #make output directory
-        output_dir = f"{current_directory}/lotus_outputs/{args.stat}/{args.model}/"
-        os.makedirs(output_dir)
-        output_base = f"{output_dir}/{args.ensemble}"
+        lotus_output_dir = SETTINGS.lotus_output_dir
+        os.makedirs(lotus_output_dir)
+        output_base = f"{lotus_output_dir}/{ensemble}"
 
         #submit to lotus
-        bsub_command = f"bsub -q {defaults.queue} -W {defaults.wallclock} -o " \
+        bsub_command = f"bsub -q {SETTINGS.queue} -W {SETTINGS.wallclock} -o " \
                        f"{output_base}.out -e {output_base}.err {current_directory}" \
-                       f"/run_chunk.py -s {args.stat} -m {args.model} -e {i} -v {args.var}"
+                       f"/run_chunk.py -s {args.stat} -m {args.model} -e {ensemble} -v {args.var}"
         subprocess.call(bsub_command, shell=True)
         print(f"running {bsub_command}")
 
