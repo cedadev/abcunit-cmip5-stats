@@ -1,9 +1,9 @@
 # abcunit-cmip5-stats
 Processing Framework for calculating temporal statistics from CMIP5 (using ABCUnit)
 
-The statistics that can be calculated are the maximum, minimumm and mean.
+The statistics that can be calculated are the maximum, minimum and mean.
 
-The structure of the files is:
+### Structure ###
 
 1. Run all script = `run_all.py`
 * Calculates given statistic for chosen models, ensembles and variables
