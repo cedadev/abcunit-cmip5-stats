@@ -34,9 +34,10 @@ The statistics that can be calculated are the maximum, minimum and mean.
 ## Example usage ##
 
 ### Edit these files to match your setup: ###
-*`lib/defaults.py`
-*`SETTINGS.py`
-*`setup-env.sh`
+
+* `lib/defaults.py`
+* `SETTINGS.py`
+* `setup-env.sh`
 
 
 
