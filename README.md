@@ -3,7 +3,7 @@ Processing Framework for calculating temporal statistics from CMIP5 (using ABCUn
 
 The statistics that can be calculated are the maximum, minimum and mean.
 
-### Structure ###
+## Structure ##
 
 1. Run all script = `run_all.py`
 * Calculates given statistic for chosen models, ensembles and variables
