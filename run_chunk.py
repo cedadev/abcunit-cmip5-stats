@@ -50,7 +50,7 @@ def define_file_paths(args):
 def find_files(args):
     """Finds files that correspond to the given arguments"""
     pattern = '/badc/cmip5/data/cmip5/output1/{model}/historical/mon/land' \
-              '/Lmon/{ensemble}/latest/{var_id}/*.nc'
+              '/Lmon/{ensemble}/latest/{var}/*.nc'
     try:
         glob_pattern = pattern.format(model=args.model,
                                       ensemble=args.ensemble, var=args.var)
