@@ -38,7 +38,7 @@ The statistics that can be calculated are the maximum, minimum and mean.
 * `SETTINGS.py`
 * `setup-env.sh`
 
-***First run the `setup-env.sh` script to setup up your environment.***
+***First run the*** `setup-env.sh` ***script to setup up your environment.***
 
 Options for models, ensembles and variables can be found in `lib/defaults.py`. Note that the model is defined by its <institute>/<model> combination.
 
