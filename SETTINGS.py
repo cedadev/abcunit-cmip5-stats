@@ -1,24 +1,23 @@
-import os
+EXIT_AFTER_N_FAILURES = 1000000
 
-exit_after_n_failures = 1000000
+START_DATE = '1900-01-01'
 
-start_date = '1900-01-01'
+END_DATE = '2000-01-01'
 
-end_date = '2000-01-01'
+# lotus settings
 
-queue = 'short-serial'
+QUEUE = 'short-serial'
 
-wallclock = '00:10'
+WALLCLOCK = '00:10'
 
-# basepaths
-current_directory = os.getcwd()
-# lotus_output_dir = f"{current_directory}/lotus_outputs/{args.stat}/{args.model}/"
-#
-# arguments = f"{args.stat}/{args.model}/{args.ensemble}"
-#
-# output_file_path = f"{current_directory}/outputs/{arguments}"
-# success_file_path = f"{current_directory}/success/{arguments}"
-# bad_data_file_path = f"{current_directory}/bad_data/{arguments}"
-# bad_num_file_path = f"{current_directory}/bad_num/{arguments}"
-# no_output_file_path = f"{current_directory}/no_output/{arguments}"
+# Output path templates
+
+LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/lotus_outputs/{stat}/{model}/"
+
+OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/outputs/{stat}/{model}/{ensemble}"
+SUCCESS_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/success/{stat}/{model}/{ensemble}"
+BAD_DATA_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/bad_data/{stat}/{model}/{ensemble}"
+BAD_NUM_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/bad_num/{stat}/{model}/{ensemble}"
+NO_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/no_output/{stat}/{model}/{ensemble}"
+
 

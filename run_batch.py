@@ -41,8 +41,8 @@ def arg_parse_batch():
 
 def loop_over_ensembles(args):
     """Submits run_chunk to lotus for each of the ensembles listed"""
-    current_directory = os.getcwd()
-
+    
+    # turn arguments into string
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
     vars = str(args.var).strip("[]").replace(",", "")
@@ -50,15 +50,21 @@ def loop_over_ensembles(args):
     # iterate over each ensemble
     for ensemble in args.ensemble:
         print(f"Running for {ensemble}")
+        
+        # define lotus output file path
+        current_directory = os.getcwd()  # get current working directory
+        
+        # define lotus output file path
+        lotus_output_path = SETTINGS.OUTPUT_PATH_TMPL.format(current_directory=current_directory,
+                                                             stat=stat, model=model)
 
         # make output directory
-        lotus_output_dir = f"{current_directory}/lotus_outputs/{stat}/{model}"
-        if not os.path.exists(lotus_output_dir):
-            os.makedirs(lotus_output_dir)
-        output_base = f"{lotus_output_dir}/{ensemble}"
+        if not os.path.exists(lotus_output_path):
+            os.makedirs(lotus_output_path)
+        output_base = f"{lotus_output_path}/{ensemble}"
 
         # submit to lotus
-        bsub_command = f"bsub -q {SETTINGS.queue} -W {SETTINGS.wallclock} -o " \
+        bsub_command = f"bsub -q {SETTINGS.QUEUE} -W {SETTINGS.WALLCLOCK} -o " \
                        f"{output_base}.out -e {output_base}.err {current_directory}" \
                        f"/run_chunk.py -s {stat} -m {model} -e {ensemble} -v {vars}"
         subprocess.call(bsub_command, shell=True)
