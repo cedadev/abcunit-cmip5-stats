@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """This script takes arguments from the command line and runs the function
 run_unit for each of the variables provided as an argument or for
 all variables if none were provided."""
@@ -30,7 +32,8 @@ def arg_parse_chunk():
                                             f'{ensemble_choices}', metavar='')
     parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices,
                         help=f'Variable to run statistic on, can be one or many of: '
-                             f'{variable_choices}. Default is all variables.', metavar='')
+                             f'{variable_choices}. Default is all variables.', metavar='',
+                        nargs='*')
     return parser.parse_args()
 
 
@@ -60,7 +63,7 @@ def find_files(model, ensemble, var):
 
 
 def is_valid_range(nc_files, start=SETTINGS.start_date, end=SETTINGS.end_date):
-    """Checks the time range is valid for the given NetCDF files"""
+    """Checks the date range is valid for the given NetCDF files"""
     try:
         ds = xr.open_mfdataset(nc_files)
         times_in_range = ds.time.loc[start:end]
@@ -76,12 +79,11 @@ def is_valid_range(nc_files, start=SETTINGS.start_date, end=SETTINGS.end_date):
         return False
 
 
-def calculate_statistic(nc_files, args, stat):
+def calculate_statistic(nc_files, var, stat):
     """Calculates the required statistic for each variable for each ensemble
     and model requested."""
     dataset = xr.open_mfdataset(nc_files)
     stat = str(stat)
-    var = args.var
     if stat == 'mean':
         mean = dataset[var].mean(dim='time')
         return mean
@@ -93,25 +95,21 @@ def calculate_statistic(nc_files, args, stat):
         return minimum
 
 
-def run_unit(args):
+def run_unit(args, failure_count):
     """Loops over each variable listed to calculate the statistic.
     Keeps track of whether the job was successful or not and writes the
     result of the statistic to an output file."""
-    # keep track of failures. Many failures expected for this example so the
-    # limit is set high
-    # good practice to include this
-    failure_count = 0
-    
-    #turn arguments into string
-    #vars = str(args.var).strip("[] \'")
+
+    # turn arguments into string
+
     ensemble = str(args.ensemble).strip("[] \' ")
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
 
 
     for var in args.var:
-        var = 'rh'
         # exit if too many failures
+
         if failure_count >= SETTINGS.exit_after_n_failures:
             print('[ERROR] Maximum failure count met')
             sys.exit(1)
@@ -146,8 +144,8 @@ def run_unit(args):
         if not nc_files:
             if not os.path.exists(file_paths[2]):
                 os.makedirs(file_paths[2])
-            open(os.path.join(file_paths[2], f'{var}.nc.txt'), 'w') #creates empty file
-            print('[ERROR] No valid files')
+            f = open(os.path.join(file_paths[2], f'{var}.nc.txt'), 'w') # creates empty file
+            print(f'[ERROR] No valid files for {var}')
             failure_count += 1
             continue
 
@@ -161,11 +159,12 @@ def run_unit(args):
             continue
 
         # calculate the statistic
-        statistic = calculate_statistic(nc_files, args, stat)
+        statistic = calculate_statistic(nc_files, var, stat)
         if not os.path.exists(file_paths[0]):
             os.makedirs(file_paths[0])
         statistic.to_netcdf(f'{file_paths[0]}/{var}.nc')
         output_path = f'{file_paths[0]}/{var}.nc'
+        print(f'[INFO] Output file generated: {file_paths[0]}/{var}.nc')
         if not os.path.exists(output_path):
             os.rmdir(file_paths[0])
             if not os.path.exists(file_paths[4]):
@@ -180,13 +179,21 @@ def run_unit(args):
             os.makedirs(file_paths[1])
         open(os.path.join(file_paths[1], f'{var}.nc.txt'), 'w')
 
-    print("Completed job")
+    print(f"Completed job")
 
 
 def main():
     """Runs script if called on command line"""
+
+    # define global variables
+
+    # keep track of failures. Many failures expected for this example so the
+    # limit is set high
+    # good practice to include this
+    failure_count = 0
+
     args = arg_parse_chunk()
-    run_unit(args)
+    run_unit(args, failure_count)
 
 
 if __name__ == '__main__':

@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 """This script takes arguments from the command line and submits the script
 run_chunk to lotus for each of the ensembles provided as an argument or for
 all ensembles if none were provided."""
 
-#import glob
+
 import argparse
 import os
 #import xarray as xr
@@ -27,10 +29,12 @@ def arg_parse_batch():
                                             f'must be one of: {model_choices}', metavar='')
     parser.add_argument('-e', '--ensemble', type=str, default=ensemble_choices,
                         help=f'Ensemble to run statistic on, can be one or many of: '
-                             f'{ensemble_choices}. Default is all ensembles.', metavar='')
+                             f'{ensemble_choices}. Default is all ensembles.', metavar='',
+                        nargs='*')
     parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices,
                         help=f'Variable to run statistic on, can be one or many of: '
-                             f'{variable_choices}. Default is all variables', metavar='')
+                             f'{variable_choices}. Default is all variables', metavar='',
+                        nargs='*')
     return parser.parse_args()
 
 
@@ -38,19 +42,25 @@ def arg_parse_batch():
 def loop_over_ensembles(args):
     """Submits run_chunk to lotus for each of the ensembles listed"""
     current_directory = os.getcwd()
-    #iterate over each ensemble
+
+    model = str(args.model).strip("[] \'")
+    stat = str(args.stat).strip("[] \'")
+    vars = str(args.var).strip("[]").replace(",", "")
+
+    # iterate over each ensemble
     for ensemble in args.ensemble:
         print(f"Running for {ensemble}")
 
-        #make output directory
-        lotus_output_dir = SETTINGS.lotus_output_dir
-        os.makedirs(lotus_output_dir)
+        # make output directory
+        lotus_output_dir = f"{current_directory}/lotus_outputs/{stat}/{model}"
+        if not os.path.exists(lotus_output_dir):
+            os.makedirs(lotus_output_dir)
         output_base = f"{lotus_output_dir}/{ensemble}"
 
-        #submit to lotus
+        # submit to lotus
         bsub_command = f"bsub -q {SETTINGS.queue} -W {SETTINGS.wallclock} -o " \
                        f"{output_base}.out -e {output_base}.err {current_directory}" \
-                       f"/run_chunk.py -s {args.stat} -m {args.model} -e {ensemble} -v {args.var}"
+                       f"/run_chunk.py -s {stat} -m {model} -e {ensemble} -v {vars}"
         subprocess.call(bsub_command, shell=True)
         print(f"running {bsub_command}")
 
