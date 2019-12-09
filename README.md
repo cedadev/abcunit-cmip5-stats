@@ -62,7 +62,7 @@ The outputs - success files, failure files and resulting netCDF file if the job 
 
 `current-directory/output-type/stat/model/ensemble/var.nc(.txt)`
    
-* current-directory is the directory containing the python scripts.
+* current-directory is the directory you are in when running the python scripts.
 * output-type can be one of:
    * outputs - The netCDF file corresponding to the chosen statistic.
    * success - Empty file produced when the job is successful.
