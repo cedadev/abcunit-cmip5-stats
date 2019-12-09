@@ -56,9 +56,11 @@ Running the 'run chunk' script locally, instead of using LOTUS, which is how it 
 
 In each example, all other arguments are optional and can be included.
 
+## Outputs ##
+
 The outputs - success files, failure files and resulting netCDF file if the job is successful are stored in directories with the following structure:
 
-current-directory/output-type/stat/model/ensemble/var.nc(.txt)
+`current-directory/output-type/stat/model/ensemble/var.nc(.txt)`
    
 * current-directory is the directory containing the python scripts.
 * output-type can be one of:
@@ -70,7 +72,7 @@ current-directory/output-type/stat/model/ensemble/var.nc(.txt)
    
 The lotus outputs follow a similar pattern:
 
-current-directory/output-type/stat/model/ensemble.out or ensemble.err
+`current-directory/output-type/stat/model/ensemble.out or ensemble.err`
 
    
    
