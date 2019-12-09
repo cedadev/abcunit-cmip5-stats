@@ -38,7 +38,7 @@ The statistics that can be calculated are the maximum, minimum and mean.
 * `SETTINGS.py`
 * `setup-env.sh`
 
-*First run the `setup-env.sh` script to setup up your environment.*
+***First run the `setup-env.sh` script to setup up your environment.***
 
 Options for models, ensembles and variables can be found in `lib/defaults.py`. Note that the model is defined by its <institute>/<model> combination.
 
@@ -58,19 +58,19 @@ In each example, all other arguments are optional and can be included.
 
 The outputs - success files, failure files and resulting netCDF file if the job is successful are stored in directories with the following structure:
 
-<current-directory>/<output-type>/<stat>/<model>/<ensemble>/<var>.nc(.txt)
+current-directory/output-type/stat/model/ensemble/var.nc(.txt)
    
-*<current-directory> is the directory containing the python scripts.
-*<output-type> can be one of:
-   *outputs - The netCDF file corresponding to the chosen statistic.
-   *success - Empty file produced when the job is successful.
-   *bad_data - Empty file produced when no netCDF files could be found for the chosen arguments.
-   *bad_num - Empty file produced when the chosen date range is invalid for the chosen files.
-   *no_output - Empty file produced when the output file could not be generated.
+* current-directory is the directory containing the python scripts.
+* output-type can be one of:
+   * outputs - The netCDF file corresponding to the chosen statistic.
+   * success - Empty file produced when the job is successful.
+   * bad_data - Empty file produced when no netCDF files could be found for the chosen arguments.
+   * bad_num - Empty file produced when the chosen date range is invalid for the chosen files.
+   * no_output - Empty file produced when the output file could not be generated.
    
 The lotus outputs follow a similar pattern:
 
-<current-directory>/<output-type>/<stat>/<model>/<ensemble>.out or <ensemble>.err
+current-directory/output-type/stat/model/ensemble.out or ensemble.err
 
    
    
