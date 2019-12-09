@@ -41,19 +41,19 @@ def arg_parse_batch():
 
 def loop_over_ensembles(args):
     """Submits run_chunk to lotus for each of the ensembles listed"""
-    
+
     # turn arguments into string
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
-    vars = str(args.var).strip("[]").replace(",", "")
+    variables = str(args.var).strip("[]").replace(",", "")
 
     # iterate over each ensemble
     for ensemble in args.ensemble:
         print(f"Running for {ensemble}")
-        
+
         # define lotus output file path
         current_directory = os.getcwd()  # get current working directory
-        
+
         # define lotus output file path
         lotus_output_path = SETTINGS.OUTPUT_PATH_TMPL.format(current_directory=current_directory,
                                                              stat=stat, model=model)
@@ -66,7 +66,7 @@ def loop_over_ensembles(args):
         # submit to lotus
         bsub_command = f"bsub -q {SETTINGS.QUEUE} -W {SETTINGS.WALLCLOCK} -o " \
                        f"{output_base}.out -e {output_base}.err {current_directory}" \
-                       f"/run_chunk.py -s {stat} -m {model} -e {ensemble} -v {vars}"
+                       f"/run_chunk.py -s {stat} -m {model} -e {ensemble} -v {variables}"
         subprocess.call(bsub_command, shell=True)
         print(f"running {bsub_command}")
 

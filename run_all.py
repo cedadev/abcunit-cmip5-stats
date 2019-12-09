@@ -41,14 +41,14 @@ def loop_over_models(args):
 
     stat = str(args.stat).strip("[] \'")
     ensembles = str(args.ensemble).strip("[]").replace(",", "")
-    vars = str(args.var).strip("[]").replace(",", "")
+    variables = str(args.var).strip("[]").replace(",", "")
 
     # iterate over models
     for model in args.model:
         print(f"Running for {model}")
         # calls run_batch from command line
         cmd = f"{current_directory}/run_batch.py -s {stat} -m {model} -e " \
-              f"{ensembles} -v {vars}"
+              f"{ensembles} -v {variables}"
         subprocess.call(cmd, shell=True)
 
 
@@ -59,7 +59,5 @@ def main():
     loop_over_models(args)
 
 
-
 if __name__ == '__main__':
     main()
-    

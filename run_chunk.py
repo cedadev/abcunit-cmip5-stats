@@ -60,7 +60,7 @@ def is_valid_range(nc_files, start=SETTINGS.START_DATE, end=SETTINGS.END_DATE):
         print('[INFO] Range is valid')
         return True
 
-    except Exception as err:
+    except AssertionError as err:
         print('[ERROR] Range is invalid')
         return False
 
@@ -87,12 +87,12 @@ def run_unit(args, failure_count):
     result of the statistic to an output file."""
 
     # turn arguments into string
-    ensemble = str(args.ensemble).strip("[] \' ")
+    ensemble = str(args.ensemble).strip("[] \'")
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
 
     for var in args.var:
-        
+
         # exit if too many failures
         if failure_count >= SETTINGS.EXIT_AFTER_N_FAILURES:
             print('[ERROR] Maximum failure count met')
@@ -100,23 +100,23 @@ def run_unit(args, failure_count):
 
         # define output file paths
         current_directory = os.getcwd()  # get current working directory
-        
-        output_path = SETTINGS.OUTPUT_PATH_TMPL.format(current_directory=current_directory,
-                                                       stat=stat,  model=model, ensemble=ensemble)
-        success_path = SETTINGS.SUCCESS_PATH_TMPL.format(current_directory=current_directory,
-                                                         stat=stat, model=model, ensemble=ensemble)
-        bad_data_path = SETTINGS.BAD_DATA_PATH_TMPL.format(current_directory=current_directory,
-                                                           stat=stat, model=model, ensemble=ensemble)
-        bad_num_path = SETTINGS.BAD_DATA_PATH_TMPL.format(current_directory=current_directory,
-                                                          stat=stat, model=model, ensemble=ensemble)
-        no_output_path = SETTINGS.NO_OUTPUT_PATH_TMPL.format(current_directory=current_directory,
-                                                             stat=stat, model=model, ensemble=ensemble)
+
+        output_path = SETTINGS.OUTPUT_PATH_TMPL.format(
+            current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
+        success_path = SETTINGS.SUCCESS_PATH_TMPL.format(
+            current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
+        bad_data_path = SETTINGS.BAD_DATA_PATH_TMPL.format(
+            current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
+        bad_num_path = SETTINGS.BAD_DATA_PATH_TMPL.format(
+            current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
+        no_output_path = SETTINGS.NO_OUTPUT_PATH_TMPL.format(
+            current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
 
         # check for success file - if exists - continue
         success_file = f'{success_path}/{var}.nc.txt'
         if os.path.exists(success_file):
             print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var}.'
-                  ' Success file found')
+                  ' Success file found.')
             continue
 
         # delete previous failure files
@@ -139,7 +139,7 @@ def run_unit(args, failure_count):
         if not nc_files:
             if not os.path.exists(bad_data_path):
                 os.makedirs(bad_data_path)
-            f = open(os.path.join(bad_data_path, f'{var}.nc.txt'), 'w') # creates empty file
+            open(os.path.join(bad_data_path, f'{var}.nc.txt'), 'w') # creates empty file
             print(f'[ERROR] No valid files for {var}')
             failure_count += 1
             continue
