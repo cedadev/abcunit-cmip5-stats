@@ -54,7 +54,10 @@ Running the 'run chunk' script locally, instead of using LOTUS, which is how it 
 
 `python run_chunk.py -s mean -m MOHC/HadGEM2-ES -e r1i1p1`
 
-In each example, all other arguments are optional and can be included.
+In each example, all other arguments are optional and can be included. 
+For example, to calculate the mean of 2 variables:
+
+`python run_chunk.py -s mean -m MOHC/HadGEM2-ES -e r1i1p1 -v rh ra`
 
 ## Outputs ##
 
