@@ -75,6 +75,3 @@ The outputs - success files, failure files and resulting netCDF file if the job 
 The lotus outputs follow a similar pattern:
 
 `current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble.out or ensemble.err`
-
-   
-   
