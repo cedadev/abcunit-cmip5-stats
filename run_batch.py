@@ -15,12 +15,19 @@ import SETTINGS
 
 
 def arg_parse_batch():
-    """Parses arguments given at the command line"""
+    """
+    Parses arguments given at the command line
+
+    :return:
+    """
+    
     parser = argparse.ArgumentParser()
+    
     stat_choices = ['min', 'max', 'mean']
     model_choices = defaults.models
     ensemble_choices = defaults.ensembles
     variable_choices = defaults.variables
+    
     parser.add_argument('-s', '--stat', nargs=1, type=str, choices=stat_choices,
                         required=True, help=f'Type of statistic, must be one of: '
                                             f'{stat_choices}', metavar='')
@@ -38,9 +45,13 @@ def arg_parse_batch():
     return parser.parse_args()
 
 
-
 def loop_over_ensembles(args):
-    """Submits run_chunk to lotus for each of the ensembles listed"""
+    """
+    Submits run_chunk to lotus for each of the ensembles listed
+
+    :param args:
+    :return:
+    """
 
     # turn arguments into string
     model = str(args.model).strip("[] \'")
@@ -61,6 +72,7 @@ def loop_over_ensembles(args):
         # make output directory
         if not os.path.exists(lotus_output_path):
             os.makedirs(lotus_output_path)
+            
         output_base = f"{lotus_output_path}/{ensemble}"
 
         # submit to lotus
@@ -68,11 +80,13 @@ def loop_over_ensembles(args):
                        f"{output_base}.out -e {output_base}.err {current_directory}" \
                        f"/run_chunk.py -s {stat} -m {model} -e {ensemble} -v {variables}"
         subprocess.call(bsub_command, shell=True)
+        
         print(f"running {bsub_command}")
 
 
 def main():
     """Runs script if called on command line"""
+    
     args = arg_parse_batch()
     loop_over_ensembles(args)
 

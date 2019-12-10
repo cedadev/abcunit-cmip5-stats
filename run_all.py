@@ -12,12 +12,20 @@ from lib import defaults
 
 
 def arg_parse_all():
-    """Parses arguments given at the command line"""
+    """
+    Parses arguments given at the command line
+
+    :return:
+    """
+
+
     parser = argparse.ArgumentParser()
+
     stat_choices = ['min', 'max', 'mean']
     model_choices = defaults.models
     ensemble_choices = defaults.ensembles
     variable_choices = defaults.variables
+
     parser.add_argument('-s', '--stat', nargs=1, type=str, choices=stat_choices, required=True,
                         help=f'Type of statistic, must be one of: {stat_choices}', metavar='')
     parser.add_argument('-m', '--model', type=str, default=model_choices,
@@ -36,7 +44,13 @@ def arg_parse_all():
 
 
 def loop_over_models(args):
-    """Runs run batch for each of the models listed"""
+    """
+    Runs run batch for each of the models listed
+
+    :param args:
+    :return:
+    """
+
     current_directory = os.getcwd()
 
     stat = str(args.stat).strip("[] \'")
@@ -46,6 +60,7 @@ def loop_over_models(args):
     # iterate over models
     for model in args.model:
         print(f"Running for {model}")
+
         # calls run_batch from command line
         cmd = f"{current_directory}/run_batch.py -s {stat} -m {model} -e " \
               f"{ensembles} -v {variables}"
@@ -54,6 +69,7 @@ def loop_over_models(args):
 
 def main():
     """Runs script if called on command line"""
+
     args = arg_parse_all()
     print(f"Finding {args.stat} of {args.var} for {args.model}, {args.ensemble}.")
     loop_over_models(args)
