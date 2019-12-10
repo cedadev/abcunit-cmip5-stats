@@ -106,12 +106,14 @@ def test_arg_parse_chunk_3():
 
 # test converting from string
 def test_arg_parse_return():
-        sys.argv = 'run_chunk.py -s min -m MOHC/HadGEM2-ES -e r11i1p1 -v rh'.split()
-        fpath = '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/mon/land/Lmon' \
-                '/r1i1p1/latest/rh/rh_Lmon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc'
-        ds = xr.open_dataset(fpath)
-        args = arg_parse_chunk()
-        var_id = args.var
-        minimum = ds[var_id].min(dim='time')
-        assert minimum.shape == (145, 192)
+    sys.argv = 'run_chunk.py -s min -m MOHC/HadGEM2-ES -e r11i1p1 -v rh'.split()
+    fpath = '/badc/cmip5/data/cmip5/output1/MOHC/HadGEM2-ES/historical/mon/land/Lmon' \
+            '/r1i1p1/latest/rh/rh_Lmon_HadGEM2-ES_historical_r1i1p1_193412-195911.nc'
+
+    ds = xr.open_dataset(fpath)
+    args = arg_parse_chunk()
+
+    mn = ds['rh'].min(dim='time')
+    assert(mn.shape == (145, 192))
+    
 
