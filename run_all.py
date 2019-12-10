@@ -15,9 +15,8 @@ def arg_parse_all():
     """
     Parses arguments given at the command line
 
-    :return:
+    :return: Namespace object built from attributes parsed from command line.
     """
-
 
     parser = argparse.ArgumentParser()
 
@@ -47,8 +46,7 @@ def loop_over_models(args):
     """
     Runs run batch for each of the models listed
 
-    :param args:
-    :return:
+    :param args: (namespace) Namespace object built from attributes parsed from command line
     """
 
     current_directory = os.getcwd()

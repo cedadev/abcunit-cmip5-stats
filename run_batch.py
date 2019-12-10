@@ -18,7 +18,7 @@ def arg_parse_batch():
     """
     Parses arguments given at the command line
 
-    :return:
+    :return: Namespace object built from attributes parsed from command line.
     """
     
     parser = argparse.ArgumentParser()
@@ -47,10 +47,9 @@ def arg_parse_batch():
 
 def loop_over_ensembles(args):
     """
-    Submits run_chunk to lotus for each of the ensembles listed
+    Submits run_chunk to lotus for each of the ensembles listed.
 
-    :param args:
-    :return:
+    :param args: (namespace) Namespace object built from attributes parsed from command line
     """
 
     # turn arguments into string

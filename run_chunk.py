@@ -21,7 +21,6 @@ def arg_parse_chunk():
     :return: Namespace object built from attributes parsed from command line.
     """
 
-    
     parser = argparse.ArgumentParser()
     
     stat_choices = ['min', 'max', 'mean']
@@ -49,9 +48,9 @@ def find_files(model, ensemble, var_id):
     """
     Finds files that correspond to the given arguments.
 
-    :param model (string): Model chosen as argument at command line.
-    :param ensemble (string): Ensemble chosen as argument at command line.
-    :param var_id (string): Variable chosen as argument at command line.
+    :param model: (string) Model chosen as argument at command line.
+    :param ensemble: (string) Ensemble chosen as argument at command line.
+    :param var_id: (string) Variable chosen as argument at command line.
     :return: The netCDF files that correspond to the arguments.
     """
     
@@ -68,10 +67,12 @@ def is_valid_range(nc_files, start=SETTINGS.START_DATE, end=SETTINGS.END_DATE):
     """
     Checks the date range is valid for the given NetCDF files
 
-    :param nc_files:
-    :param start:
-    :param end:
-    :return:
+    :param nc_files: (netCDF) The netCDF files found from the command line arguments
+    :param start: (string: format = YYYY-MM-DD) Date to start range the statistic is
+           calculated over.
+    :param end: (string: format = YYYY-MM-DD) Date to end range the statistic is
+           calculated over.
+    :return: Boolean: True if range is valid, False if not.
     """
     
     try:
@@ -94,10 +95,10 @@ def calculate_statistic(nc_files, var_id, stat):
     Calculates the required statistic for each variable for each ensemble
     and model requested.
 
-    :param nc_files:
-    :param var_id:
-    :param stat:
-    :return:
+    :param nc_files: (netCDF) The netCDF files found from the command line arguments
+    :param var_id: (string) Variable chosen as argument at command line.
+    :param stat: (string) Statistic to calculate as specified at the command line.
+    :return: NetCDF file of the calculated statistic.
     """
 
     dataset = xr.open_mfdataset(nc_files)
@@ -113,16 +114,18 @@ def calculate_statistic(nc_files, var_id, stat):
     return result
 
 
-def run_chunk(args, failure_count):
+def run_chunk(args):
     """
-    Loops over each variable listed to calculate the statistic.
-    Keeps track of whether the job was successful or not and writes the
-    result of the statistic to an output file.
+    Loops over each variable listed and calls run_unit.
 
-    :param args:
-    :param failure_count:
-    :return:
+    :param args: (namespace) Namespace object built from attributes parsed from command line
     """
+    # set initial failure count
+    # keep track of failures. Many failures expected for this example so the
+    # limit is set high
+    # good practice to include this
+    failure_count = 0
+
 
     # turn arguments into string
     ensemble = str(args.ensemble).strip("[] \'")
@@ -146,13 +149,15 @@ def run_chunk(args, failure_count):
 
 def run_unit(stat, model, ensemble, var_id):
     """
+    Calculates the chosen statistic for the arguments provided.
+    Keeps track of whether the job was successful or not and writes the
+    result of the statistic to an output file.
 
-    :param failure_count:
-    :param stat:
-    :param model:
-    :param ensemble:
-    :param var_id:
-    :return:
+    :param stat: (string) Statistic to calculate as specified at the command line.
+    :param model: (string) Model chosen as argument at command line.
+    :param ensemble: (string) Ensemble chosen as argument at command line.
+    :param var_id: (string) Variable chosen as argument at command line.
+    :return: txt or NetCDF file depending on success/ failure of the job.
     """
 
     # define output file paths
@@ -254,16 +259,8 @@ def run_unit(stat, model, ensemble, var_id):
 def main():
     """Runs script if called on command line"""
 
-    # define global variables
-    failure_count = 0
-
-    # keep track of failures. Many failures expected for this example so the
-    # limit is set high
-    # good practice to include this
-
-
     args = arg_parse_chunk()
-    run_chunk(args, failure_count)
+    run_chunk(args)
 
 
 if __name__ == '__main__':
