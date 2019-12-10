@@ -104,11 +104,11 @@ def calculate_statistic(nc_files, var_id, stat):
     stat = str(stat)
 
     if stat == 'mean':
-        result = dataset[var_id].mean(dim='time')
+        result = dataset[var_id].mean(dim='time', keep_attrs=True)
     elif stat == 'max':
-        result = dataset[var_id].max(dim='time')
+        result = dataset[var_id].max(dim='time', keep_attrs=True)
     elif stat == 'min':
-        result = dataset[var_id].max(dim='time')
+        result = dataset[var_id].max(dim='time', keep_attrs=True)
 
     return result
 
@@ -249,7 +249,6 @@ def run_unit(stat, model, ensemble, var_id):
         os.makedirs(success_path)
 
     open(os.path.join(success_path, f'{var_id}.nc.txt'), 'w')
-
 
 
 def main():
