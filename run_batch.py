@@ -38,7 +38,7 @@ def arg_parse_batch():
                         help=f'Ensemble to run statistic on, can be one or many of: '
                              f'{ensemble_choices}. Default is all ensembles.', metavar='',
                         nargs='*')
-    parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices,
+    parser.add_argument('-v', '--var_id', choices=variable_choices, default=variable_choices,
                         help=f'Variable to run statistic on, can be one or many of: '
                              f'{variable_choices}. Default is all variables', metavar='',
                         nargs='*')
@@ -56,7 +56,7 @@ def loop_over_ensembles(args):
     # turn arguments into string
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
-    variables = str(args.var).strip("[]").replace(",", "")
+    variables = str(args.var_id).strip("[]").replace(",", "")
 
     # iterate over each ensemble
     for ensemble in args.ensemble:
@@ -86,7 +86,7 @@ def loop_over_ensembles(args):
 
 def main():
     """Runs script if called on command line"""
-    
+
     args = arg_parse_batch()
     loop_over_ensembles(args)
 

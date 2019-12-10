@@ -38,27 +38,27 @@ def arg_parse_chunk():
     parser.add_argument('-e', '--ensemble', nargs=1, type=str, choices=ensemble_choices,
                         required=True, help=f'Ensemble to run statistic on, must be one of: '
                                             f'{ensemble_choices}', metavar='')
-    parser.add_argument('-v', '--var', choices=variable_choices, default=variable_choices,
+    parser.add_argument('-v', '--var_id', choices=variable_choices, default=variable_choices,
                         help=f'Variable to run statistic on, can be one or many of: '
                              f'{variable_choices}. Default is all variables.', metavar='',
                         nargs='*')
     return parser.parse_args()
 
 
-def find_files(model, ensemble, var):
+def find_files(model, ensemble, var_id):
     """
     Finds files that correspond to the given arguments.
 
     :param model (string): Model chosen as argument at command line.
     :param ensemble (string): Ensemble chosen as argument at command line.
-    :param var (string): Variable chosen as argument at command line.
+    :param var_id (string): Variable chosen as argument at command line.
     :return: The netCDF files that correspond to the arguments.
     """
     
     pattern = '/badc/cmip5/data/cmip5/output1/{model}/historical/mon/land' \
-              '/Lmon/{ensemble}/latest/{var}/*.nc'
+              '/Lmon/{ensemble}/latest/{var_id}/*.nc'
     glob_pattern = pattern.format(model=model,
-                                  ensemble=ensemble, var=var)
+                                  ensemble=ensemble, var_id=var_id)
     nc_files = glob.glob(glob_pattern)
     print(f'[INFO] found files: {nc_files}')
     return nc_files
@@ -89,13 +89,13 @@ def is_valid_range(nc_files, start=SETTINGS.START_DATE, end=SETTINGS.END_DATE):
         return False
 
 
-def calculate_statistic(nc_files, var, stat):
+def calculate_statistic(nc_files, var_id, stat):
     """
     Calculates the required statistic for each variable for each ensemble
     and model requested.
 
     :param nc_files:
-    :param var:
+    :param var_id:
     :param stat:
     :return:
     """
@@ -104,11 +104,11 @@ def calculate_statistic(nc_files, var, stat):
     stat = str(stat)
 
     if stat == 'mean':
-        result = dataset[var].mean(dim='time')
+        result = dataset[var_id].mean(dim='time')
     elif stat == 'max':
-        result = dataset[var].max(dim='time')
+        result = dataset[var_id].max(dim='time')
     elif stat == 'min':
-        result = dataset[var].max(dim='time')
+        result = dataset[var_id].max(dim='time')
 
     return result
 
@@ -129,30 +129,29 @@ def run_chunk(args, failure_count):
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
 
-    for var in args.var:
+    for var_id in args.var_id:
         
         # exit if too many failures
         if failure_count >= SETTINGS.EXIT_AFTER_N_FAILURES:
             print('[ERROR] Maximum failure count met')
             sys.exit(1)
 
-        unit = run_unit(stat, model, ensemble, var)
+        unit = run_unit(stat, model, ensemble, var_id)
         if unit is False:
             failure_count += 1
             continue
 
-
     print(f"Completed job")
 
 
-def run_unit(stat, model, ensemble, var):
+def run_unit(stat, model, ensemble, var_id):
     """
 
     :param failure_count:
     :param stat:
     :param model:
     :param ensemble:
-    :param var:
+    :param var_id:
     :return:
     """
 
@@ -171,29 +170,29 @@ def run_unit(stat, model, ensemble, var):
         current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
 
     # check for success file - if exists - continue
-    success_file = f'{success_path}/{var}.nc.txt'
+    success_file = f'{success_path}/{var_id}.nc.txt'
 
     if os.path.exists(success_file):
-        print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var}.'
+        print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
         #continue
         return
 
     # delete previous failure files
-    bad_data_file = f'{bad_data_path}/{var}.nc.txt'
+    bad_data_file = f'{bad_data_path}/{var_id}.nc.txt'
     if os.path.exists(bad_data_file):
         os.unlink(bad_data_file)
 
-    bad_num_file = f'{bad_num_path}/{var}.nc.txt'
+    bad_num_file = f'{bad_num_path}/{var_id}.nc.txt'
     if os.path.exists(bad_num_file):
         os.unlink(bad_num_file)
 
-    no_output_file = f'{no_output_path}/{var}.nc.txt'
+    no_output_file = f'{no_output_path}/{var_id}.nc.txt'
     if os.path.exists(no_output_file):
         os.unlink(no_output_file)
 
     # find files
-    nc_files = find_files(model, ensemble, var)
+    nc_files = find_files(model, ensemble, var_id)
 
     # check data is valid
     if not nc_files:
@@ -201,9 +200,9 @@ def run_unit(stat, model, ensemble, var):
         if not os.path.exists(bad_data_path):
             os.makedirs(bad_data_path)
 
-        open(os.path.join(bad_data_path, f'{var}.nc.txt'), 'w')  # creates empty file
+        open(os.path.join(bad_data_path, f'{var_id}.nc.txt'), 'w')  # creates empty file
 
-        print(f'[ERROR] No valid files for {var}')
+        print(f'[ERROR] No valid files for {var_id}')
         #failure_count += 1
         #continue
         return False
@@ -215,21 +214,21 @@ def run_unit(stat, model, ensemble, var):
         if not os.path.exists(bad_num_path):
             os.makedirs(bad_num_path)
 
-        open(os.path.join(bad_num_path, f'{var}.nc.txt'), 'w')
+        open(os.path.join(bad_num_path, f'{var_id}.nc.txt'), 'w')
 
         #failure_count += 1
         #continue
         return False
 
     # calculate the statistic
-    statistic = calculate_statistic(nc_files, var, stat)
+    statistic = calculate_statistic(nc_files, var_id, stat)
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    statistic.to_netcdf(f'{output_path}/{var}.nc')
-    output_file = f'{output_path}/{var}.nc'
-    print(f'[INFO] Output file generated: {output_path}/{var}.nc')
+    statistic.to_netcdf(f'{output_path}/{var_id}.nc')
+    output_file = f'{output_path}/{var_id}.nc'
+    print(f'[INFO] Output file generated: {output_path}/{var_id}.nc')
 
     if not os.path.exists(output_file):
         os.rmdir(output_path)
@@ -237,11 +236,11 @@ def run_unit(stat, model, ensemble, var):
         if not os.path.exists(no_output_path):
             os.makedirs(no_output_path)
 
-        open(os.path.join(no_output_path, f'{var}.nc.txt'), 'w')
+        open(os.path.join(no_output_path, f'{var_id}.nc.txt'), 'w')
 
         #failure_count += 1
 
-        print(f'[ERROR] Failed to generate output file: {output_path}/{var}.nc')
+        print(f'[ERROR] Failed to generate output file: {output_path}/{var_id}.nc')
         #continue
         return False
 
@@ -249,7 +248,7 @@ def run_unit(stat, model, ensemble, var):
     if not os.path.exists(success_path):
         os.makedirs(success_path)
 
-    open(os.path.join(success_path, f'{var}.nc.txt'), 'w')
+    open(os.path.join(success_path, f'{var_id}.nc.txt'), 'w')
 
 
 
