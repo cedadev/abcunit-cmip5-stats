@@ -1,4 +1,6 @@
 xarray
 
+pylint
+
 # Testing
 pytest
