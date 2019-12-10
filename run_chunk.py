@@ -22,12 +22,12 @@ def arg_parse_chunk():
     """
 
     parser = argparse.ArgumentParser()
-    
+
     stat_choices = ['min', 'max', 'mean']
     model_choices = defaults.models
     ensemble_choices = defaults.ensembles
     variable_choices = defaults.variables
-    
+
     parser.add_argument('-s', '--stat', nargs=1, type=str, choices=stat_choices,
                         required=True, help=f'Type of statistic, must be one of: '
                                             f'{stat_choices}', metavar='')
@@ -41,6 +41,7 @@ def arg_parse_chunk():
                         help=f'Variable to run statistic on, can be one or many of: '
                              f'{variable_choices}. Default is all variables.', metavar='',
                         nargs='*')
+
     return parser.parse_args()
 
 
@@ -53,13 +54,14 @@ def find_files(model, ensemble, var_id):
     :param var_id: (string) Variable chosen as argument at command line.
     :return: The netCDF files that correspond to the arguments.
     """
-    
+
     pattern = '/badc/cmip5/data/cmip5/output1/{model}/historical/mon/land' \
               '/Lmon/{ensemble}/latest/{var_id}/*.nc'
     glob_pattern = pattern.format(model=model,
                                   ensemble=ensemble, var_id=var_id)
     nc_files = glob.glob(glob_pattern)
     print(f'[INFO] found files: {nc_files}')
+
     return nc_files
 
 
@@ -74,7 +76,7 @@ def is_valid_range(nc_files, start=SETTINGS.START_DATE, end=SETTINGS.END_DATE):
            calculated over.
     :return: Boolean: True if range is valid, False if not.
     """
-    
+
     try:
         ds = xr.open_mfdataset(nc_files)
         times_in_range = ds.time.loc[start:end]
@@ -126,14 +128,14 @@ def run_chunk(args):
     # good practice to include this
     failure_count = 0
 
-
     # turn arguments into string
+
     ensemble = str(args.ensemble).strip("[] \'")
     model = str(args.model).strip("[] \'")
     stat = str(args.stat).strip("[] \'")
 
     for var_id in args.var_id:
-        
+
         # exit if too many failures
         if failure_count >= SETTINGS.EXIT_AFTER_N_FAILURES:
             print('[ERROR] Maximum failure count met')
@@ -142,6 +144,8 @@ def run_chunk(args):
         unit = run_unit(stat, model, ensemble, var_id)
         if unit is False:
             failure_count += 1
+            continue
+        else:
             continue
 
     print(f"Completed job")
@@ -180,8 +184,7 @@ def run_unit(stat, model, ensemble, var_id):
     if os.path.exists(success_file):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
-        #continue
-        return
+        return 
 
     # delete previous failure files
     bad_data_file = f'{bad_data_path}/{var_id}.nc.txt'
@@ -208,8 +211,6 @@ def run_unit(stat, model, ensemble, var_id):
         open(os.path.join(bad_data_path, f'{var_id}.nc.txt'), 'w')  # creates empty file
 
         print(f'[ERROR] No valid files for {var_id}')
-        #failure_count += 1
-        #continue
         return False
 
     # check date range is valid
@@ -220,9 +221,6 @@ def run_unit(stat, model, ensemble, var_id):
             os.makedirs(bad_num_path)
 
         open(os.path.join(bad_num_path, f'{var_id}.nc.txt'), 'w')
-
-        #failure_count += 1
-        #continue
         return False
 
     # calculate the statistic
@@ -243,10 +241,7 @@ def run_unit(stat, model, ensemble, var_id):
 
         open(os.path.join(no_output_path, f'{var_id}.nc.txt'), 'w')
 
-        #failure_count += 1
-
         print(f'[ERROR] Failed to generate output file: {output_path}/{var_id}.nc')
-        #continue
         return False
 
     # create success file
