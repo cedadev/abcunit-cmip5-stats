@@ -29,7 +29,6 @@ The statistics that can be calculated are the maximum, minimum and mean.
     * Checks the date range specified is valid
     * Calculates the statistic and writes to output file
     * Checks output file exists
-    * Checks the size of the output file is as expected
     
 ## Example usage ##
 
@@ -63,7 +62,7 @@ For example, to calculate the mean of 2 variables:
 
 The outputs - success files, failure files and resulting netCDF file if the job is successful are stored in directories with the following structure:
 
-`current-directory/output-type/stat/model/ensemble/var.nc(.txt)`
+`current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble/var.nc(.txt)`
    
 * current-directory is the directory you are in when running the python scripts.
 * output-type can be one of:
@@ -75,7 +74,7 @@ The outputs - success files, failure files and resulting netCDF file if the job 
    
 The lotus outputs follow a similar pattern:
 
-`current-directory/output-type/stat/model/ensemble.out or ensemble.err`
+`current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble.out or ensemble.err`
 
    
    
