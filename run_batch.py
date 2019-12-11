@@ -53,9 +53,9 @@ def loop_over_ensembles(args):
     """
 
     # turn arguments into string
-    model = str(args.model).strip("[] \'")
-    stat = str(args.stat).strip("[] \'")
-    variables = str(args.var_id).strip("[]").replace(",", "")
+    model = ' '.join(args.model)
+    stat = ' '.join(args.stat)
+    variables = ' '.join(args.var_id)
 
     # iterate over each ensemble
     for ensemble in args.ensemble:
