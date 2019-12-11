@@ -65,8 +65,8 @@ def loop_over_ensembles(args):
         current_directory = os.getcwd()  # get current working directory
 
         # define lotus output file path
-        lotus_output_path = SETTINGS.OUTPUT_PATH_TMPL.format(current_directory=current_directory,
-                                                             stat=stat, model=model)
+        lotus_output_path = SETTINGS.LOTUS_OUTPUT_PATH_TMPL.format(
+            current_directory=current_directory, stat=stat, model=model)
 
         # make output directory
         if not os.path.exists(lotus_output_path):
