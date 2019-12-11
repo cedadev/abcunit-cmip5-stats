@@ -51,9 +51,9 @@ def loop_over_models(args):
 
     current_directory = os.getcwd()
 
-    stat = str(args.stat).strip("[] \'")
-    ensembles = str(args.ensemble).strip("[]").replace(",", "")
-    variables = str(args.var_id).strip("[]").replace(",", "")
+    stat = ''.join(args.stat)
+    ensembles = ''.join(args.ensemble)
+    variables = ''.join(args.var_id)
 
     # iterate over models
     for model in args.model:

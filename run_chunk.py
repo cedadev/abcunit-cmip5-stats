@@ -130,9 +130,9 @@ def run_chunk(args):
 
     # turn arguments into string
 
-    ensemble = str(args.ensemble).strip("[] \'")
-    model = str(args.model).strip("[] \'")
-    stat = str(args.stat).strip("[] \'")
+    ensemble = ''.join(args.ensemble)
+    model = ''.join(args.model)
+    stat = ''.join(args.stat)
 
     for var_id in args.var_id:
 
