@@ -130,11 +130,12 @@ def run_chunk(args):
 
     # turn arguments into string
 
-    ensemble = ''.join(args.ensemble)
-    model = ''.join(args.model)
-    stat = ''.join(args.stat)
+    ensemble = ' '.join(args.ensemble)
+    model = ' '.join(args.model)
+    stat = ' '.join(args.stat)
 
     for var_id in args.var_id:
+        print(f"Running for {var_id}")
 
         # exit if too many failures
         if failure_count >= SETTINGS.EXIT_AFTER_N_FAILURES:

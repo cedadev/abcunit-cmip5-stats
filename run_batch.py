@@ -53,9 +53,9 @@ def loop_over_ensembles(args):
     """
 
     # turn arguments into string
-    model = ''.join(args.model)
-    stat = ''.join(args.stat)
-    variables = ''.join(args.var_id)
+    model = ' '.join(args.model)
+    stat = ' '.join(args.stat)
+    variables = ' '.join(args.var_id)
 
     # iterate over each ensemble
     for ensemble in args.ensemble:
