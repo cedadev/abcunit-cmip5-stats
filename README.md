@@ -39,7 +39,7 @@ The statistics that can be calculated are the maximum, minimum and mean.
 
 ***First run the*** `setup-env.sh` ***script to setup up your environment.***
 
-Options for models, ensembles and variables can be found in `lib/defaults.py`. Note that the model is defined by its <institute>/<model> combination.
+Options for models, ensembles and variables can be found in `lib/defaults.py`. Note that the model is defined by its institute/model combination.
 
 Running the top level 'run all' script at the command line:
 
@@ -54,7 +54,7 @@ Running the 'run chunk' script locally, instead of using LOTUS, which is how it 
 `python run_chunk.py -s mean -m MOHC/HadGEM2-ES -e r1i1p1`
 
 In each example, all other arguments are optional and can be included. 
-For example, to calculate the mean of 2 variables:
+For example, to calculate the mean of only 2 variables for in one model and ensemble:
 
 `python run_chunk.py -s mean -m MOHC/HadGEM2-ES -e r1i1p1 -v rh ra`
 
@@ -62,7 +62,7 @@ For example, to calculate the mean of 2 variables:
 
 The outputs - success files, failure files and resulting netCDF file if the job is successful are stored in directories with the following structure:
 
-`current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble/var.nc(.txt)`
+`current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble/var_id.nc(.txt)`
    
 * current-directory is the directory you are in when running the python scripts.
 * output-type can be one of:
