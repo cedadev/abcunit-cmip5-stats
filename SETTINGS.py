@@ -12,7 +12,7 @@ WALLCLOCK = '00:10'
 
 # Output path templates
 
-LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/lotus_outputs/{stat}/{model}/"
+LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/lotus_outputs/{stat}/{model}"
 
 OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/outputs/{stat}/{model}/{ensemble}"
 SUCCESS_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/success/{stat}/{model}/{ensemble}"
