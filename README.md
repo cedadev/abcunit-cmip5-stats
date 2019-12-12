@@ -4,10 +4,10 @@ Processing Framework for calculating temporal statistics from CMIP5 (using ABCUn
 ## Overview ##
 
 The name ABCunit corresponds to the 4 layers the workflow is split in to:
-A - all
-B - batch
-C - chunk
-and the Unit
+1. A - all
+2. B - batch
+3. C - chunk
+4. The Unit
 
 These scripts are an example of using the ABCUnit structure on CMIP5 data. This provides a repteable and efficient workflow.
 
