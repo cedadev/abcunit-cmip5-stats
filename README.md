@@ -1,7 +1,19 @@
 # abcunit-cmip5-stats
-Processing Framework for calculating temporal statistics from CMIP5 (using ABCUnit)
+Processing Framework for calculating temporal statistics from CMIP5 (using ABCUnit).
+
+## Overview ##
+
+The name ABCunit corresponds to the 4 layers the workflow is split in to:
+1. A - all
+2. B - batch
+3. C - chunk
+4. The Unit
+
+These scripts are an example of using the ABCUnit structure on CMIP5 data. This provides a repteable and efficient workflow.
 
 The statistics that can be calculated are the maximum, minimum and mean.
+
+The models, ensembles and variables available can be found in `lib/defaults.py`
 
 ## Structure ##
 
@@ -23,6 +35,7 @@ The statistics that can be calculated are the maximum, minimum and mean.
 * Typically run on lotus but can be run from the command line
 * Calculates the statstic for the specified model, ensemble and variables
 * Statistic, model and ensemble must all be specified if run from the command line
+* Defaults to all variables
 * For each variable it: 
     * Ignores if already calculated
     * Finds the necessary files
@@ -32,10 +45,19 @@ The statistics that can be calculated are the maximum, minimum and mean.
     
 ## Example usage ##
 
+Log in to a JASMIN sci server:
+
+`ssh <user-id>@jasmin-sci5.ceda.ac.uk`
+
 ### Edit these files to match your setup: ###
 
 * `SETTINGS.py`
 * `setup-env.sh`
+
+Clone this repositroy and make sure you are in the top level abcunit-cmip5-stats directory:
+
+* `https://github.com/cedadev/abcunit-cmip5-stats.git`
+* `cd abcunit-cmip5-stats`
 
 ***First run the*** `setup-env.sh` ***script to setup up your environment.***
 
