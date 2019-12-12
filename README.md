@@ -56,8 +56,8 @@ Log in to a JASMIN sci server:
 
 Clone this repositroy and make sure you are in the top level abcunit-cmip5-stats directory:
 
->`https://github.com/cedadev/abcunit-cmip5-stats.git`
->`cd abcunit-cmip5-stats`
+* `https://github.com/cedadev/abcunit-cmip5-stats.git`
+* `cd abcunit-cmip5-stats`
 
 ***First run the*** `setup-env.sh` ***script to setup up your environment.***
 
