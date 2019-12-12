@@ -32,10 +32,19 @@ The statistics that can be calculated are the maximum, minimum and mean.
     
 ## Example usage ##
 
+Log in to a JASMIN sci server:
+
+`ssh <user-id>@jasmin-sci5.ceda.ac.uk`
+
 ### Edit these files to match your setup: ###
 
 * `SETTINGS.py`
 * `setup-env.sh`
+
+Clone this repositroy and make sure you are in the top level abcunit-cmip5-stats directory:
+
+`https://github.com/ellesmith88/abcunit-cmip5-stats.git`
+`cd abcunit-cmip5-stats`
 
 ***First run the*** `setup-env.sh` ***script to setup up your environment.***
 
