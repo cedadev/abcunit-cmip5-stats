@@ -7,7 +7,7 @@ import pytest
 import SETTINGS
 import run_chunk
 
-
+# test netCDF file produced has the expected dimensions
 def test_output_shape():
     cmd = 'python run_chunk.py -s min -m MOHC/HadGEM2-ES -e r1i1p1 -v rh'
     subprocess.call(cmd, shell=True)
@@ -19,7 +19,7 @@ def test_output_shape():
     cmd_delete = 'rm -r ALL_OUTPUTS'
     subprocess.call(cmd_delete, shell=True)
 
-
+# test that valid data function fails if data is out of chosen range
 @pytest.mark.xfail(raises=AssertionError)
 def test_is_valid_range():
     # expect this to fail
@@ -39,13 +39,12 @@ def test_is_valid_range():
     assert len(times_in_range) == n_req_times
 
 
-# test return acts as expected - replacing continue as no longer in for loop
-
+# test return acts as expected in run_unit
 def test_no_valid_files():
     value = run_chunk.run_unit('min', 'MOHC/HadGEM2-ES', 'r12i1p1', 'rh')
     assert value is False
 
-
+# testing failure count works
 @pytest.mark.xfail(raises=SystemExit)
 def test_failure_count():
     # expect system exit - expect 2 errors
@@ -54,7 +53,7 @@ def test_failure_count():
     SETTINGS.EXIT_AFTER_N_FAILURES = 1 
     run_chunk.run_chunk(args)
 
-
+# check nothing is returned when success file found
 def test_success_file():
     cmd = 'python run_chunk.py -s min -m MOHC/HadGEM2-ES -e r1i1p1 -v rh'
     subprocess.call(cmd, shell=True)
