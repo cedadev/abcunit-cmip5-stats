@@ -75,12 +75,12 @@ def loop_over_ensembles(args):
         output_base = f"{lotus_output_path}/{ensemble}"
 
         # submit to lotus
-        bsub_command = f"bsub -q {SETTINGS.QUEUE} -W {SETTINGS.WALLCLOCK} -o " \
+        slurm_command = f"sbatch -p {SETTINGS.QUEUE} -t {SETTINGS.WALLCLOCK} -o " \
                        f"{output_base}.out -e {output_base}.err {current_directory}" \
                        f"/run_chunk.py -s {stat} -m {model} -e {ensemble} -v {variables}"
-        subprocess.call(bsub_command, shell=True)
+        subprocess.call(slurm_command, shell=True, env=os.environ)
 
-        print(f"running {bsub_command}")
+        print(f"running {slurm_command}")
 
 
 def main():

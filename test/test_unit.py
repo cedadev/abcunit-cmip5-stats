@@ -39,7 +39,7 @@ def test_create_and_save_netcdf_file_input_as_dates(tmpdir):
                         coords={'x': [1, 2, 3, 4],
                                 'y': [1, 2, 3, 4],
                                 't': pd.date_range('1990-02-01', periods=5,
-                                                   dtype='datetime64[ns]', freq='M')})
+                                                    freq='M')})
         ds.to_netcdf(path="test_dir/example_dataset_1.nc")
 
     except PermissionError as exc:
@@ -51,7 +51,7 @@ def test_create_and_save_netcdf_file_input_as_dates_2(tmpdir):
                     coords={'x': [1, 2, 3, 4],
                             'y': [1, 2, 3, 4],
                             't': pd.date_range('1990-02-01', periods=5,
-                                               dtype='datetime64[ns]', freq='M')})
+                                                freq='M')})
     ds.to_netcdf(path=tmpdir.mkdir("test_dir").join("example_dataset_1.nc"))
 
 
