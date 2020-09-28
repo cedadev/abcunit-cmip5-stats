@@ -36,17 +36,21 @@ class OutputInterface(object):
     def count_successes(self):
         """ Returns the number of successful results 
         in the file system / database """
-        raise NotImplementedErrors
+        raise NotImplementedError
 
     def count_failures(self):
         """ Returns the number of failed results 
         in the file system / database """
-        raise NotImplementedErrors
+        raise NotImplementedError
 
-    def insert_success(self):
+    def insert_success(self, identifier):
         """ Adds a successful result """
-        raise NotImplementedErrors
+        raise NotImplementedError
 
-    def insert_failure(self):
+    def insert_failure(self, identifier, error_type):
         """ Adds a failed result """
-        raise NotImplementedErrors
+        raise NotImplementedError
+
+    def close_connection(self):
+        """ Closes readwrite connection to data """
+        raise NotImplementedError 
