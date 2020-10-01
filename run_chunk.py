@@ -11,6 +11,8 @@ import argparse
 import xarray as xr
 
 from lib import defaults
+from outputAPI.database_handler import DataBaseAPI
+from outputAPI.file_system_handler import FileSystemAPI
 import SETTINGS
 
 
@@ -151,6 +153,19 @@ def run_chunk(args):
 
     print(f"Completed job")
 
+def get_results_handler(n_facets, error_types):
+    #read settings, decide on file or database.
+    #instansiate object
+
+    if SETTINGS.BACKEND == 'db':
+        constring = os.environ["ABCUNIT_DB_SETTINGS"]
+        return DataBaseAPI(constring) #What to do about table name?
+
+    else if SETTINGS.BACKEND == 'file':
+        return FileSystemAPI(n_facets, error_types)
+
+    else:
+        #some sort of error
 
 def run_unit(stat, model, ensemble, var_id):
     """
@@ -164,12 +179,19 @@ def run_unit(stat, model, ensemble, var_id):
     :param var_id: (string) Variable chosen as argument at command line.
     :return: txt or NetCDF file depending on success/ failure of the job.
     """
-
+    #Create output object (results handler)
+    rh = get_results_handler(4, ['bad_data', 'bad_num', 'no_outpupt'])
+    job_id = f'{stat}/{model}/{ensemble}/{var_id}'
     # define output file paths
     current_directory = os.getcwd()  # get current working directory
 
+    #How should I get the username? Maybe can get it from a shell comand, or extract
+    #from the current_dir
+
     output_path = SETTINGS.OUTPUT_PATH_TMPL.format(
-        current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
+        GWS='/gws/nopw/j04/cedaproc', USER='test')
+
+    # FSH - delete
     success_path = SETTINGS.SUCCESS_PATH_TMPL.format(
         current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
     bad_data_path = SETTINGS.BAD_DATA_PATH_TMPL.format(
@@ -179,14 +201,17 @@ def run_unit(stat, model, ensemble, var_id):
     no_output_path = SETTINGS.NO_OUTPUT_PATH_TMPL.format(
         current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
 
+    # FSH - delete
     # check for success file - if exists - continue
     success_file = f'{success_path}/{var_id}.nc.txt'
 
+    #FSH - replace this with fh.get_result(job_id) == 'success'
     if os.path.exists(success_file):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
         return 
 
+    #FSH - replace this all with fh.delete_result(job_id)
     # delete previous failure files
     bad_data_file = f'{bad_data_path}/{var_id}.nc.txt'
     if os.path.exists(bad_data_file):
@@ -199,17 +224,19 @@ def run_unit(stat, model, ensemble, var_id):
     no_output_file = f'{no_output_path}/{var_id}.nc.txt'
     if os.path.exists(no_output_file):
         os.unlink(no_output_file)
+    #---
 
     # find files
     nc_files = find_files(model, ensemble, var_id)
 
     # check data is valid
     if not nc_files:
-
+        #FSH - replace all with fh.insert_failure(job_id, 'bad_data')
         if not os.path.exists(bad_data_path):
             os.makedirs(bad_data_path)
 
         open(os.path.join(bad_data_path, f'{var_id}.nc.txt'), 'w')  # creates empty file
+        #---
 
         print(f'[ERROR] No valid files for {var_id}')
         return False
@@ -217,11 +244,12 @@ def run_unit(stat, model, ensemble, var_id):
     # check date range is valid
     validity = is_valid_range(nc_files)
     if not validity:
-
+        #FSH - replace all with fh.insert_failure(job_id, 'bad_num')
         if not os.path.exists(bad_num_path):
             os.makedirs(bad_num_path)
 
         open(os.path.join(bad_num_path, f'{var_id}.nc.txt'), 'w')
+        #---
         return False
 
     # calculate the statistic
@@ -237,19 +265,24 @@ def run_unit(stat, model, ensemble, var_id):
     if not os.path.exists(output_file):
         os.rmdir(output_path)
 
+        #FSH - replace all with fh.insert_failure(job_id, 'no_output')
         if not os.path.exists(no_output_path):
             os.makedirs(no_output_path)
 
         open(os.path.join(no_output_path, f'{var_id}.nc.txt'), 'w')
+        #---
 
         print(f'[ERROR] Failed to generate output file: {output_path}/{var_id}.nc')
         return False
 
+    #FSH - replace alll with fh.insert_successs(job_id)
     # create success file
     if not os.path.exists(success_path):
         os.makedirs(success_path)
 
     open(os.path.join(success_path, f'{var_id}.nc.txt'), 'w')
+    #---
+    #return True????
 
 
 def main():

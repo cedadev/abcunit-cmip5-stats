@@ -14,10 +14,15 @@ WALLCLOCK = '00:10'
 
 LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/lotus_outputs/{stat}/{model}"
 
-OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/outputs/{stat}/{model}/{ensemble}"
+OUTPUT_PATH_TMPL = "{GWS}/{USER}/abcunit-outputs"
 SUCCESS_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/success/{stat}/{model}/{ensemble}"
 BAD_DATA_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/bad_data/{stat}/{model}/{ensemble}"
 BAD_NUM_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/bad_num/{stat}/{model}/{ensemble}"
 NO_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/no_output/{stat}/{model}/{ensemble}"
 
+GENERAL_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/{identifier}/{stat}/{model}/{ensemble}"
 
+SUCCESS_DIR = "{current_directory}/ALL_OUTPUTS/success"
+FAILURE_DIR = "{current_directory}/ALL_OUTPUTS/failure"
+
+BACKEND = 'db' #'db' or 'file'

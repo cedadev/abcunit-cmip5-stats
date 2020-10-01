@@ -28,6 +28,11 @@ class OutputInterface(object):
         """ Deletes all results """
         raise NotImplementedError
 
+    def ran_succesfully(self, identifier):
+        """ Returns true / false on whether the result with this
+        identifier is successful """
+        raise NotImplementedError
+
     def count_results(self):
         """ Returns the number of results in
         the file system / database """
@@ -50,7 +55,3 @@ class OutputInterface(object):
     def insert_failure(self, identifier, error_type):
         """ Adds a failed result """
         raise NotImplementedError
-
-    def close_connection(self):
-        """ Closes readwrite connection to data """
-        raise NotImplementedError 
