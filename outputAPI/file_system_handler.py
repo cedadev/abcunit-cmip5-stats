@@ -1,28 +1,30 @@
 import glob
 import os
 import numpy as np
-from handler_interface import OutputInterface
+#from handler_interface import OutputInterface
 import SETTINGS
 
-class FileSystemAPI(OutputInterface):
+class FileSystemAPI(object):
 
-    def __init__(self, n_facets, error_types):
+    def __init__(self, n_facets, sep, error_types):
         self.current_dir = os.getcwd()
         self.error_types = error_types
         self.n_facets = n_facets
+        self.sep = sep
         self.success_dir = SETTINGS.SUCCESS_DIR.format(current_directory=self.current_dir)
         self.failure_dir = SETTINGS.FAILURE_DIR.format(current_directory=self.current_dir)
 
     def _path_to_identifier(self, path):
         path_arr = path.split(os.sep)
         trimmed_path = '/'.join(path_arr[-self.n_facets:])
-        return trimmed_path
+        return trimmed_path.replace('/', self.sep)
 
     def _identifier_to_path(self, identifier, result):
+        id_path = identifier.replace(self.sep, '/')
         if result == 'success':
-            return os.path.join(self.success_dir, identifier)
+            return os.path.join(self.success_dir, id_path)
         else:
-            return os.path.join(self.failure_dir, result, identifier)   
+            return os.path.join(self.failure_dir, result, id_path)   
 
     def get_result(self, identifier):
         path = self._identifier_to_path(identifier, 'success')
@@ -42,8 +44,9 @@ class FileSystemAPI(OutputInterface):
             results[identifier] = 'success'
 
         error_dict = self.get_failed_runs()
-        for (error_type, identifier) in error_dict.items():
-            results[identifier] = error_type
+        for (error_type, identifiers) in error_dict.items():
+            for identifier in identifiers:
+                results[identifier] = error_type
 
         return results
 
@@ -103,13 +106,17 @@ class FileSystemAPI(OutputInterface):
 
     def insert_success(self, identifier):
         path = self._identifier_to_path(identifier, 'success')
-        if not os.path.exists(path): #Should there be a case for if it does?
-            os.makedirs(os.path.dirname(path))
+        dr = os.path.dirname(path)
+
+        if not os.path.isdir(dr): #Should there be a case for if it does?
+            os.makedirs(dr)
         open(path, 'w') #empty success file
 
     def insert_failure(self, identifier, error_type):
         path = self._identifier_to_path(identifier, error_type)
-        if not os.path.exists(path): #Should there be a case for if it does?
-            os.makedirs(os.path.dirname(path))
+        dr = os.path.dirname(path)
+
+        if not os.path.isdir(dr): #Should there be a case for if it does?
+            os.makedirs(dr) #used to be os.path.dirname(path) 
         with open(path, 'w') as writer:
             writer.write(f'{error_type} has occured!')

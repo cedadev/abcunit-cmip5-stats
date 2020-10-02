@@ -153,7 +153,7 @@ def run_chunk(args):
 
     print(f"Completed job")
 
-def get_results_handler(n_facets, error_types):
+def get_results_handler(n_facets, sep, error_types):
     """ 
     Returns a result handler which either uses a database or the file system
     depending on the SETTING.BACKEND.
@@ -161,14 +161,15 @@ def get_results_handler(n_facets, error_types):
     $ABCUNIT_DB_SETTINGS which is set to "dbname=<db_name> user=<user_name> password=<password>".
     
     :param n_facets: (int) Number of facets used to define a unit.
+    :param sep: (str) Delimeter for facet separation
     :param error_types: (list) List of the string names of the types of errors tat can occur.
     """
 
     if SETTINGS.BACKEND == 'db':
-        constring = os.environ["ABCUNIT_DB_SETTINGS"]
+        constring = os.environ["ABCUNIT_DB_SETTINGS"] # Might want a try round this
         return DataBaseAPI(constring, error_types) #What to do about table name?
     else if SETTINGS.BACKEND == 'file':
-        return FileSystemAPI(n_facets, error_types)
+        return FileSystemAPI(n_facets, sep, error_types)
     else:
         #some sort of error
 
@@ -186,8 +187,11 @@ def run_unit(stat, model, ensemble, var_id):
     """
     #Create output object (results handler)
     #Maybe this should be created somewhere else???? A new one created everytime seems strange
-    rh = get_results_handler(4, ['bad_data', 'bad_num', 'no_output'])
-    job_id = f'{stat}/{model}/{ensemble}/{var_id}'
+    #5 for n_facets because model names all include a /, effectively count for 2 diractories 
+    sep = '.'
+    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace('/', sep)
+    n_facets = len(job_id.split(sep))
+    rh = get_results_handler(n_facets, sep, ['bad_data', 'bad_num', 'no_output'])
 
     current_directory = os.getcwd()  # get current working directory
     user_name = pwd.getpwuid(os.getuid()).pw_name # get username of user who ran this code

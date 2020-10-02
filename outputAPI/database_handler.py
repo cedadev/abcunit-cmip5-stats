@@ -1,13 +1,19 @@
 import psycopg2
-from handler_interface import OutputInterface
+#from handler_interface import OutputInterface
 
-class DataBaseAPI(OutputInterface):
+class DataBaseAPI(object):
 
     def __init__(self, connection_info, error_types, table_name='results'):
+        """ 
+        Returns an instace of the database handler api.
+        
+        :param connection_info: (str) Connection string in the psycopg2 format,
+        "dbname=<db_name> user=<user_name> password=<password>".
+        :param error_types: (list) List of the string names of the types of errors that can occur.
+        :param table_name: (str) Optional string for the name of the table created (default 'results')
+        """
         self.error_types = error_types
-        info = connection_info.split(' ')
-        command = f'dbname={info[0]} user={info[1]} password={info[2]}'
-        self.conn = psycopg2.connect(command)
+        self.conn = psycopg2.connect(connection_info)
         self.cur = self.conn.cursor()
         self.tablename = tablename
         self._create_table()
@@ -15,6 +21,11 @@ class DataBaseAPI(OutputInterface):
     def _create_table(self):
         self.cur.execute(f'CREATE TABLE IF NOT EXISTS {self.tablename}' \
              '(id varchar(255) PRIMARY KEY, result varchar(255) NOT NULL);')
+        self.conn.commit()
+
+    def _delete_table(self):
+        self.cur.execute(f"DROP TABLE {self.tablename};")
+        self.conn.commit()
 
     def get_result(self, identifier):
         query = f"SELECT result FROM {self.tablename} " \
@@ -69,7 +80,7 @@ class DataBaseAPI(OutputInterface):
         return self.cur.fetchone()[0]
 
     def count_successes(self):
-         query = f"SELECT COUNT(*) FROM {self.tablename} " \
+        query = f"SELECT COUNT(*) FROM {self.tablename} " \
                 "WHERE result='success';"
         self.cur.execute(query)
         return self.cur.fetchone()[0]
@@ -92,6 +103,6 @@ class DataBaseAPI(OutputInterface):
         self.cur.execute(query)
         self.conn.commit()
 
-    def close_conection(self):
+    def close_connection(self):
         self.cur.close()
         self.conn.close()
