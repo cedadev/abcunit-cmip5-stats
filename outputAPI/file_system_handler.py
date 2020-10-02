@@ -1,6 +1,7 @@
 import glob
 import os
 import numpy as np
+import functools
 #from handler_interface import OutputInterface
 import SETTINGS
 
@@ -19,13 +20,24 @@ class FileSystemAPI(object):
         trimmed_path = '/'.join(path_arr[-self.n_facets:])
         return trimmed_path.replace('/', self.sep)
 
+    @validate # don't actually need because this is always called from a decorated function
     def _identifier_to_path(self, identifier, result):
         id_path = identifier.replace(self.sep, '/')
         if result == 'success':
             return os.path.join(self.success_dir, id_path)
         else:
-            return os.path.join(self.failure_dir, result, id_path)   
+            return os.path.join(self.failure_dir, result, id_path)
 
+    def validate(func):
+        @functools.wraps(func)
+        def validate_identifier(*args, **kwargs):
+            identifier = args[0]
+            if '/' in identifier:
+                raise ValueError
+            return func(*args, **kwargs)
+        return validate_identifier
+
+    @validate
     def get_result(self, identifier):
         path = self._identifier_to_path(identifier, 'success')
         if os.path.exists(path):
@@ -65,6 +77,7 @@ class FileSystemAPI(object):
         
         return failures
 
+    @validate
     def delete_result(self, identifier):
         path = self._identifier_to_path(identifier, 'success')
         if os.path.exists(path):
@@ -87,6 +100,7 @@ class FileSystemAPI(object):
         for failure_file in failure_files:
             os.unlink(failure_file)
 
+    @validate
     def ran_succesfully(self, identifier):
         path = self._identifier_to_path(identifier, 'success')
         return os.path.exists(path)
@@ -104,6 +118,7 @@ class FileSystemAPI(object):
             size += len(error_dict[error])
         return size
 
+    @validate
     def insert_success(self, identifier):
         path = self._identifier_to_path(identifier, 'success')
         dr = os.path.dirname(path)
@@ -112,6 +127,7 @@ class FileSystemAPI(object):
             os.makedirs(dr)
         open(path, 'w') #empty success file
 
+    @validate # could check error_type too
     def insert_failure(self, identifier, error_type):
         path = self._identifier_to_path(identifier, error_type)
         dr = os.path.dirname(path)
