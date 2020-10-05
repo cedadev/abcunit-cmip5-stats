@@ -167,11 +167,11 @@ def get_results_handler(n_facets, sep, error_types):
 
     if SETTINGS.BACKEND == 'db':
         constring = os.environ["ABCUNIT_DB_SETTINGS"] # Might want a try round this
-        return DataBaseAPI(constring, error_types) #What to do about table name?
+        return DataBaseAPI(constring, error_types)
     else if SETTINGS.BACKEND == 'file':
         return FileSystemAPI(n_facets, sep, error_types)
     else:
-        #some sort of error
+        raise ValueError
 
 def run_unit(stat, model, ensemble, var_id):
     """
@@ -185,21 +185,21 @@ def run_unit(stat, model, ensemble, var_id):
     :param var_id: (string) Variable chosen as argument at command line.
     :return: txt or NetCDF file depending on success/ failure of the job.
     """
-    #Create output object (results handler)
-    #Maybe this should be created somewhere else???? A new one created everytime seems strange
-    #5 for n_facets because model names all include a /, effectively count for 2 diractories 
+
     sep = '.'
-    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace('/', sep)
+    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace('/', sep) # Model names contain a / annoyingly
     n_facets = len(job_id.split(sep))
     rh = get_results_handler(n_facets, sep, ['bad_data', 'bad_num', 'no_output'])
 
     current_directory = os.getcwd()  # get current working directory
     user_name = pwd.getpwuid(os.getuid()).pw_name # get username of user who ran this code
 
+    #get path to send nc file results to
     output_path = SETTINGS.OUTPUT_PATH_TMPL.format(
         GWS='/gws/nopw/j04/cedaproc', USER=user_name)
 
-    if fh.get_result(job_id) == 'success':
+    #check if job has already been run successfully 
+    if fh.ran_succesfully(job_id):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
         return 
