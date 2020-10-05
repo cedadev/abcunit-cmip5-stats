@@ -16,16 +16,16 @@ class DataBaseAPI(object):
         self.error_types = error_types
         self.conn = psycopg2.connect(connection_info)
         self.cur = self.conn.cursor()
-        self.tablename = tablename
+        self.table_name = table_name
         self._create_table()
 
     def _create_table(self):
         """
-         Creates a table called <self.tablename> with primary key id varchar(255) and 
+         Creates a table called <self.table_name> with primary key id varchar(255) and 
         result varchar(255)
          """
 
-        self.cur.execute(f'CREATE TABLE IF NOT EXISTS {self.tablename}' \
+        self.cur.execute(f'CREATE TABLE IF NOT EXISTS {self.table_name}' \
              '(id varchar(255) PRIMARY KEY, result varchar(255) NOT NULL);')
         self.conn.commit()
 
@@ -34,7 +34,7 @@ class DataBaseAPI(object):
         Drops the database table 
         """
 
-        self.cur.execute(f"DROP TABLE {self.tablename};")
+        self.cur.execute(f"DROP TABLE {self.table_name};")
         self.conn.commit()
 
     def get_result(self, identifier):
@@ -45,7 +45,7 @@ class DataBaseAPI(object):
         :return: String result of job 
         """
 
-        query = f"SELECT result FROM {self.tablename} " \
+        query = f"SELECT result FROM {self.table_name} " \
         f"WHERE id='{identifier}';"
         self.cur.execute(query)
         if self.cur.rowcount > 0:
@@ -58,7 +58,7 @@ class DataBaseAPI(object):
         :return: Dictionary with job ids as keys and results as values
         """
 
-        query = f"SELECT * FROM {self.tablename}"
+        query = f"SELECT * FROM {self.table_name}"
         self.cur.execute(query)
         result_dict = {}
         for (name, result) in self.cur:
@@ -70,7 +70,7 @@ class DataBaseAPI(object):
         :return: List of job ids which ran successfully
         """
 
-        query = f"SELECT id FROM {self.tablename} " \
+        query = f"SELECT id FROM {self.table_name} " \
                 "WHERE result='success';"
         self.cur.execute(query)
         return [name[0] for name in self.cur]
@@ -80,7 +80,7 @@ class DataBaseAPI(object):
         :return: Dictionary with error types as keys and lists of job ids as values
         """
 
-        query = f"SELECT id, result FROM {self.tablename} " \
+        query = f"SELECT id, result FROM {self.table_name} " \
                 "WHERE result<>'success';"
         self.cur.execute(query)
         failures = dict([(key, []) for key in self.error_types])
@@ -95,7 +95,7 @@ class DataBaseAPI(object):
         :param identifier: (str) Id of the job results
         """
 
-        query = f"DELETE FROM {self.tablename} " \
+        query = f"DELETE FROM {self.table_name} " \
                 f"WHERE id='{identifier}';"
         self.cur.execute(query)
         self.conn.commit()
@@ -105,7 +105,7 @@ class DataBaseAPI(object):
         Deletes all entries in the database
         """
 
-        self.cur.execute(f"DELETE FROM {self.tablename};")
+        self.cur.execute(f"DELETE FROM {self.table_name};")
         self.conn.commit()
 
     def ran_succesfully(self, identifier):
@@ -114,17 +114,20 @@ class DataBaseAPI(object):
         :return: Boolean on if job ran successfully
         """
 
-        query = f"SELECT result FROM {self.tablename} " \
+        query = f"SELECT result FROM {self.table_name} " \
         f"WHERE id='{identifier}';"
         self.cur.execute(query)
-        return self.cur.fetchone()[0] == 'success'
+        result = self.cur.fetchone()
+        if result != None:
+            return result[0] == 'success'
+        return False
 
     def count_results(self):
         """
         :return: Int number of jobs that have been run
         """
 
-        self.cur.execute(f"SELECT COUNT(*) FROM {self.tablename};")
+        self.cur.execute(f"SELECT COUNT(*) FROM {self.table_name};")
         return self.cur.fetchone()[0]
 
     def count_successes(self):
@@ -132,7 +135,7 @@ class DataBaseAPI(object):
         :return: Int number of jobs that have ran successfully
         """
 
-        query = f"SELECT COUNT(*) FROM {self.tablename} " \
+        query = f"SELECT COUNT(*) FROM {self.table_name} " \
                 "WHERE result='success';"
         self.cur.execute(query)
         return self.cur.fetchone()[0]
@@ -142,7 +145,7 @@ class DataBaseAPI(object):
         :return: Int number of jobs that have failed
         """
 
-        query = f"SELECT COUNT(*) FROM {self.tablename} " \
+        query = f"SELECT COUNT(*) FROM {self.table_name} " \
                 "WHERE result<>'success';"
         self.cur.execute(query)
         return self.cur.fetchone()[0]
@@ -154,7 +157,7 @@ class DataBaseAPI(object):
         :param identifier: (str) Id of the job result
         """
 
-        query = f"INSERT INTO {self.tablename} " \
+        query = f"INSERT INTO {self.table_name} " \
                 f"VALUES ('{identifier}', 'success');"
         self.cur.execute(query)
         self.conn.commit()
@@ -167,7 +170,7 @@ class DataBaseAPI(object):
         :param error_type: (str) Erroneous result of the job, from the error_types list
         """
         
-        query = f"INSERT INTO {self.tablename} " \
+        query = f"INSERT INTO {self.table_name} " \
                 f"VALUES ('{identifier}', '{error_type}');"
         self.cur.execute(query)
         self.conn.commit()

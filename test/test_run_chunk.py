@@ -3,6 +3,8 @@ import subprocess
 import glob
 import sys
 import pytest
+import pwd
+import os
 
 import SETTINGS
 import run_chunk
@@ -12,7 +14,12 @@ def test_output_shape():
     cmd = 'python run_chunk.py -s min -m MOHC/HadGEM2-ES -e r1i1p1 -v rh'
     subprocess.call(cmd, shell=True)
 
-    fpath = 'ALL_OUTPUTS/outputs/min/MOHC/HadGEM2-ES/r1i1p1/rh.nc'
+
+    user_name = pwd.getpwuid(os.getuid()).pw_name
+    nc_output = SETTINGS.OUTPUT_PATH_TMPL.format(
+        GWS='/gws/nopw/j04/cedaproc', USER=user_name)
+    fpath = f'{nc_output}/rh.nc'
+    
     ds = xr.open_dataset(fpath)
     assert ds.rh.shape == (145, 192)
 
@@ -58,7 +65,4 @@ def test_success_file():
     cmd = 'python run_chunk.py -s min -m MOHC/HadGEM2-ES -e r1i1p1 -v rh'
     subprocess.call(cmd, shell=True)
     value = run_chunk.run_unit('min', 'MOHC/HadGEM2-ES', 'r1i1p1', 'rh')
-    assert value is None
-
-
-
+    assert value is True

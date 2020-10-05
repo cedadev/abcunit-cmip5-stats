@@ -73,7 +73,7 @@ def test_get_failed_names():
     assert(db_api.get_failed_runs() == failed_results)
 
 def test_get_result_dict():
-    unique_setup()
+    _unique_setup()
 
     correct_dict = {
         "min/CMCC/CMCC-CM/r2i1p1/fFire": "success",

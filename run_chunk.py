@@ -6,6 +6,7 @@ all variables if none were provided."""
 
 import sys
 import os
+import pwd
 import glob
 import argparse
 import xarray as xr
@@ -168,7 +169,7 @@ def get_results_handler(n_facets, sep, error_types):
     if SETTINGS.BACKEND == 'db':
         constring = os.environ["ABCUNIT_DB_SETTINGS"] # Might want a try round this
         return DataBaseAPI(constring, error_types)
-    else if SETTINGS.BACKEND == 'file':
+    elif SETTINGS.BACKEND == 'file':
         return FileSystemAPI(n_facets, sep, error_types)
     else:
         raise ValueError
@@ -199,20 +200,20 @@ def run_unit(stat, model, ensemble, var_id):
         GWS='/gws/nopw/j04/cedaproc', USER=user_name)
 
     #check if job has already been run successfully 
-    if fh.ran_succesfully(job_id):
+    if rh.ran_succesfully(job_id):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
-        return 
+        return True
 
     #delete failed result
-    fh.delete_result(job_id)
+    rh.delete_result(job_id)
 
     # find files
     nc_files = find_files(model, ensemble, var_id)
 
     # check data is valid
     if not nc_files:
-        fh.insert_failure(job_id, 'bad_data')
+        rh.insert_failure(job_id, 'bad_data')
 
         print(f'[ERROR] No valid files for {var_id}')
         return False
@@ -220,7 +221,7 @@ def run_unit(stat, model, ensemble, var_id):
     # check date range is valid
     validity = is_valid_range(nc_files)
     if not validity:
-        fh.insert_failure(job_id, 'bad_num')
+        rh.insert_failure(job_id, 'bad_num')
 
         print(f'[ERROR] File date range is invalid for {var_id}')
         return False
@@ -238,18 +239,18 @@ def run_unit(stat, model, ensemble, var_id):
     if not os.path.exists(output_file):
         os.rmdir(output_path)
 
-        fh.insert_failure(job_id, 'no_output')
+        rh.insert_failure(job_id, 'no_output')
 
         print(f'[ERROR] Failed to generate output file: {output_path}/{var_id}.nc')
         return False
 
     # create success file
-    fh.insert_successs(job_id)
+    rh.insert_success(job_id)
 
-    #Possibly need an if SETTINGS.BACKEND == 'db':
-    #                     fh.close_conection()
+    if SETTINGS.BACKEND == 'db':
+        rh.close_conection()
 
-    #return True????
+    return True
 
 
 def main():

@@ -2,10 +2,11 @@ import glob
 import os
 import numpy as np
 import functools
-#from handler_interface import OutputInterface
+from .handler_interface import OutputInterface
 import SETTINGS
 
-class FileSystemAPI(object):
+
+class FileSystemAPI(OutputInterface):
 
     def __init__(self, n_facets, sep, error_types):
         """ 
@@ -22,6 +23,19 @@ class FileSystemAPI(object):
         self.sep = sep
         self.success_dir = SETTINGS.SUCCESS_DIR.format(current_directory=self.current_dir)
         self.failure_dir = SETTINGS.FAILURE_DIR.format(current_directory=self.current_dir)
+  
+    def validate(func):
+        """
+        Decorator to check an identifier is of the correct format
+        """
+
+        @functools.wraps(func)
+        def validate_identifier(*args, **kwargs):
+            identifier = args[1]
+            if '/' in identifier:
+                raise ValueError
+            return func(*args, **kwargs)
+        return validate_identifier
 
     def _path_to_identifier(self, path):
         """
@@ -35,7 +49,6 @@ class FileSystemAPI(object):
         trimmed_path = '/'.join(path_arr[-self.n_facets:])
         return trimmed_path.replace('/', self.sep)
 
-    @validate # doesn't actually need because this is always called from a decorated function
     def _identifier_to_path(self, identifier, result):
         """
         Given an identifier and a result, return a full path to its result file
@@ -50,19 +63,6 @@ class FileSystemAPI(object):
             return os.path.join(self.success_dir, id_path)
         else:
             return os.path.join(self.failure_dir, result, id_path)
-
-    def validate(func):
-        """
-        Decorator to check an identifier is of the correct format
-        """
-
-        @functools.wraps(func)
-        def validate_identifier(*args, **kwargs):
-            identifier = args[0]
-            if '/' in identifier:
-                raise ValueError
-            return func(*args, **kwargs)
-        return validate_identifier
 
     @validate
     def get_result(self, identifier):
@@ -214,7 +214,7 @@ class FileSystemAPI(object):
         :param identifier: (str) Id of the job result
         :param error_type: (str) Erroneous result of the job, from the error_types list
         """
-        
+
         path = self._identifier_to_path(identifier, error_type)
         dr = os.path.dirname(path)
 
