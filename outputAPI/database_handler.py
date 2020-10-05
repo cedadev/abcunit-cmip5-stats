@@ -12,6 +12,7 @@ class DataBaseAPI(object):
         :param error_types: (list) List of the string names of the types of errors that can occur.
         :param table_name: (str) Optional string for the name of the table created (default 'results')
         """
+
         self.error_types = error_types
         self.conn = psycopg2.connect(connection_info)
         self.cur = self.conn.cursor()
@@ -56,6 +57,7 @@ class DataBaseAPI(object):
         """ 
         :return: Dictionary with job ids as keys and results as values
         """
+
         query = f"SELECT * FROM {self.tablename}"
         self.cur.execute(query)
         result_dict = {}
@@ -67,6 +69,7 @@ class DataBaseAPI(object):
         """ 
         :return: List of job ids which ran successfully
         """
+
         query = f"SELECT id FROM {self.tablename} " \
                 "WHERE result='success';"
         self.cur.execute(query)
@@ -76,6 +79,7 @@ class DataBaseAPI(object):
         """
         :return: Dictionary with error types as keys and lists of job ids as values
         """
+
         query = f"SELECT id, result FROM {self.tablename} " \
                 "WHERE result<>'success';"
         self.cur.execute(query)
@@ -89,7 +93,7 @@ class DataBaseAPI(object):
         Deletes job id and result from the database
         
         :param identifier: (str) Id of the job results
-         """
+        """
 
         query = f"DELETE FROM {self.tablename} " \
                 f"WHERE id='{identifier}';"
@@ -149,7 +153,7 @@ class DataBaseAPI(object):
         
         :param identifier: (str) Id of the job result
         """
-        
+
         query = f"INSERT INTO {self.tablename} " \
                 f"VALUES ('{identifier}', 'success');"
         self.cur.execute(query)

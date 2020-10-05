@@ -8,6 +8,14 @@ import SETTINGS
 class FileSystemAPI(object):
 
     def __init__(self, n_facets, sep, error_types):
+        """ 
+        Constructs an instace of the file system handler api.
+        
+        :param n_facets: (int) Number of directories used to define a job id
+        :param sep: (str) Character used to separate facet names in a job id 
+        :param error_types: (list) List of the string names of the types of errors that can occur.
+        """
+
         self.current_dir = os.getcwd()
         self.error_types = error_types
         self.n_facets = n_facets
@@ -16,12 +24,27 @@ class FileSystemAPI(object):
         self.failure_dir = SETTINGS.FAILURE_DIR.format(current_directory=self.current_dir)
 
     def _path_to_identifier(self, path):
+        """
+        Given a full path to a result returns its job id
+        
+        :param path: (str) Path to result file
+        :return: Job id
+        """
+
         path_arr = path.split(os.sep)
         trimmed_path = '/'.join(path_arr[-self.n_facets:])
         return trimmed_path.replace('/', self.sep)
 
-    @validate # don't actually need because this is always called from a decorated function
+    @validate # doesn't actually need because this is always called from a decorated function
     def _identifier_to_path(self, identifier, result):
+        """
+        Given an identifier and a result, return a full path to its result file
+        
+        :param identifier: (str) Id of the job result
+        :param result: (str) Result of the job
+        :return: Path to result file
+        """
+
         id_path = identifier.replace(self.sep, '/')
         if result == 'success':
             return os.path.join(self.success_dir, id_path)
@@ -29,6 +52,10 @@ class FileSystemAPI(object):
             return os.path.join(self.failure_dir, result, id_path)
 
     def validate(func):
+        """
+        Decorator to check an identifier is of the correct format
+        """
+
         @functools.wraps(func)
         def validate_identifier(*args, **kwargs):
             identifier = args[0]
@@ -39,6 +66,13 @@ class FileSystemAPI(object):
 
     @validate
     def get_result(self, identifier):
+        """ 
+        Finds the result of the job with the id passed and returns it 
+        
+        :param identifier: (str) Id of the job result
+        :return: String result of job 
+        """
+
         path = self._identifier_to_path(identifier, 'success')
         if os.path.exists(path):
             return 'success'
@@ -51,6 +85,10 @@ class FileSystemAPI(object):
         return None
 
     def get_all_results(self):
+        """ 
+        :return: Dictionary with job ids as keys and results as values
+        """
+
         results = {}
         for identifier in self.get_successful_runs():
             results[identifier] = 'success'
@@ -63,12 +101,20 @@ class FileSystemAPI(object):
         return results
 
     def get_successful_runs(self):
+        """ 
+        :return: List of job ids which ran successfully
+        """
+
         glob_pattern = os.path.join(self.success_dir, '/'.join(['*' for _ in range(self.n_facets)]))
         files = glob.glob(glob_pattern)
         return [self._path_to_identifier(fname) for fname in files]
 
 
     def get_failed_runs(self):
+        """
+        :return: Dictionary with error types as keys and lists of job ids as values
+        """
+
         failures = {}
         for error_type in self.error_types:
             glob_pattern = os.path.join(self.failure_dir, error_type, '/'.join(['*' for _ in range(self.n_facets)]))
@@ -79,6 +125,12 @@ class FileSystemAPI(object):
 
     @validate
     def delete_result(self, identifier):
+        """ 
+        Deletes result file from the file system given its identifier
+        
+        :param identifier: (str) Id of the job result
+        """
+
         path = self._identifier_to_path(identifier, 'success')
         if os.path.exists(path):
             os.unlink(path)
@@ -89,6 +141,10 @@ class FileSystemAPI(object):
                 os.unlink(path)
 
     def delete_all_results(self):
+        """
+        Deletes all result files in the file system
+        """
+
         success_pattern = os.path.join(self.success_dir, '/'.join(['*' for _ in range(self.n_facets)]))
         failure_pattern = os.path.join(self.failure_dir, '/'.join(['*' for _ in range(self.n_facets + 1)]))   
         success_files = glob.glob(success_pattern)
@@ -102,16 +158,33 @@ class FileSystemAPI(object):
 
     @validate
     def ran_succesfully(self, identifier):
+        """ 
+        :param identifier: (str) Id of the job result 
+        :return: Boolean on if job ran successfully
+        """
+
         path = self._identifier_to_path(identifier, 'success')
         return os.path.exists(path)
 
     def count_results(self):
+        """
+        :return: Int number of jobs that have been run
+        """
+
         return len(self.get_all_results())
 
     def count_successes(self):
+        """
+        :return: Int number of jobs that have ran successfully
+        """
+
         return len(self.get_successful_runs())
 
     def count_failures(self):
+        """
+        :return: Int number of jobs that have failed
+        """
+
         size = 0
         error_dict = self.get_failed_runs()
         for error in error_dict.keys():
@@ -120,6 +193,12 @@ class FileSystemAPI(object):
 
     @validate
     def insert_success(self, identifier):
+        """
+        Creates a successful result file with the identifier passed
+        
+        :param identifier: (str) Id of the job result
+        """
+
         path = self._identifier_to_path(identifier, 'success')
         dr = os.path.dirname(path)
 
@@ -129,6 +208,13 @@ class FileSystemAPI(object):
 
     @validate # could check error_type too
     def insert_failure(self, identifier, error_type):
+        """
+        Creates a result file using the identifier and error type passed
+        
+        :param identifier: (str) Id of the job result
+        :param error_type: (str) Erroneous result of the job, from the error_types list
+        """
+        
         path = self._identifier_to_path(identifier, error_type)
         dr = os.path.dirname(path)
 
