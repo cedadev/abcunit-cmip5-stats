@@ -15,7 +15,7 @@ def setup_module():
 def teardown_module():
     print("TEARING DOWN")
     db_api._delete_table()
-    db_api.close_connection()
+    db_api.close()
 
 def test_success_inserted():
     db_api.insert_success('mean/MOHC/HadGEM2-ES/r1i1p1/cLeaf')

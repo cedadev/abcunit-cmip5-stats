@@ -1,5 +1,7 @@
 
 class OutputInterface(object):
+    """ Ineterface class to define base methods for a result handler
+    class which deals with the output of job results """
 
     def get_result(self, identifier):
         """ Returns a result given its identifier """
@@ -16,8 +18,8 @@ class OutputInterface(object):
         raise NotImplementedError
 
     def get_failed_runs(self):
-        """ Returns a list of the names of all
-        failed runs """
+        """ Returns a dictionary of error types and
+        lists of jobs which result in them """
         raise NotImplementedError
 
     def delete_result(self, identifier):
@@ -34,18 +36,15 @@ class OutputInterface(object):
         raise NotImplementedError
 
     def count_results(self):
-        """ Returns the number of results in
-        the file system / database """
+        """ Returns the number of results """
         raise NotImplementedError
 
     def count_successes(self):
-        """ Returns the number of successful results 
-        in the file system / database """
+        """ Returns the number of successful results """
         raise NotImplementedError
 
     def count_failures(self):
-        """ Returns the number of failed results 
-        in the file system / database """
+        """ Returns the number of failed results """
         raise NotImplementedError
 
     def insert_success(self, identifier):
@@ -55,3 +54,9 @@ class OutputInterface(object):
     def insert_failure(self, identifier, error_type):
         """ Adds a failed result """
         raise NotImplementedError
+
+    def close(self):
+        """ Optional method for implementations that
+        need to close a conection (e.g a database). 
+        Runs 'pass' by default """
+        pass

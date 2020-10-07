@@ -159,7 +159,7 @@ def get_results_handler(n_facets, sep, error_types):
     Returns a result handler which either uses a database or the file system
     depending on the SETTING.BACKEND.
     If using a database make sure there is an environment variable called 
-    $ABCUNIT_DB_SETTINGS which is set to "dbname=<db_name> user=<user_name> password=<password>".
+    $ABCUNIT_DB_SETTINGS which is set to "dbname=<db_name> user=<user_name> host=<host_name> password=<password>".
     
     :param n_facets: (int) Number of facets used to define a unit.
     :param sep: (str) Delimeter for facet separation
@@ -167,12 +167,16 @@ def get_results_handler(n_facets, sep, error_types):
     """
 
     if SETTINGS.BACKEND == 'db':
-        constring = os.environ["ABCUNIT_DB_SETTINGS"] # Might want a try round this
+        constring = os.environ.get("ABCUNIT_DB_SETTINGS")
+        if not constring:
+            raise KeyError('Please create environment variable ABCUNI_DB_SETTINGS'
+                            'in for format of "dbname=<db_name> user=<user_name>'
+                            'host=<host_name> password=<password>"')
         return DataBaseAPI(constring, error_types)
     elif SETTINGS.BACKEND == 'file':
         return FileSystemAPI(n_facets, sep, error_types)
     else:
-        raise ValueError
+        raise ValueError('SETTINGS.BACKEND is not set properly')
 
 def run_unit(stat, model, ensemble, var_id):
     """
@@ -247,9 +251,7 @@ def run_unit(stat, model, ensemble, var_id):
     # create success file
     rh.insert_success(job_id)
 
-    if SETTINGS.BACKEND == 'db':
-        rh.close_conection()
-
+    rh.close()
     return True
 
 

@@ -31,8 +31,8 @@ class FileSystemAPI(OutputInterface):
 
         @functools.wraps(func)
         def validate_identifier(*args, **kwargs):
-            identifier = args[1]
-            if '/' in identifier:
+            identifier = args[1] # Assumes identifier is second argument
+            if os.sep in identifier:
                 raise ValueError
             return func(*args, **kwargs)
         return validate_identifier
@@ -45,9 +45,11 @@ class FileSystemAPI(OutputInterface):
         :return: Job id
         """
 
+        # Getting the last n_facets number of items in the path and joining
+        # them to create the relative identifier
         path_arr = path.split(os.sep)
-        trimmed_path = '/'.join(path_arr[-self.n_facets:])
-        return trimmed_path.replace('/', self.sep)
+        identifier = self.sep.join(path_arr[-self.n_facets:])
+        return identifier
 
     def _identifier_to_path(self, identifier, result):
         """
@@ -58,7 +60,7 @@ class FileSystemAPI(OutputInterface):
         :return: Path to result file
         """
 
-        id_path = identifier.replace(self.sep, '/')
+        id_path = identifier.replace(self.sep, os.sep)
         if result == 'success':
             return os.path.join(self.success_dir, id_path)
         else:
@@ -105,7 +107,7 @@ class FileSystemAPI(OutputInterface):
         :return: List of job ids which ran successfully
         """
 
-        glob_pattern = os.path.join(self.success_dir, '/'.join(['*' for _ in range(self.n_facets)]))
+        glob_pattern = os.path.join(self.success_dir, os.sep.join(['*' for _ in range(self.n_facets)]))
         files = glob.glob(glob_pattern)
         return [self._path_to_identifier(fname) for fname in files]
 
@@ -117,7 +119,7 @@ class FileSystemAPI(OutputInterface):
 
         failures = {}
         for error_type in self.error_types:
-            glob_pattern = os.path.join(self.failure_dir, error_type, '/'.join(['*' for _ in range(self.n_facets)]))
+            glob_pattern = os.path.join(self.failure_dir, error_type, os.sep.join(['*' for _ in range(self.n_facets)]))
             files = glob.glob(glob_pattern)
             failures[error_type] = [self._path_to_identifier(fname) for fname in files]
         
@@ -145,8 +147,8 @@ class FileSystemAPI(OutputInterface):
         Deletes all result files in the file system
         """
 
-        success_pattern = os.path.join(self.success_dir, '/'.join(['*' for _ in range(self.n_facets)]))
-        failure_pattern = os.path.join(self.failure_dir, '/'.join(['*' for _ in range(self.n_facets + 1)]))   
+        success_pattern = os.path.join(self.success_dir, os.sep.join(['*' for _ in range(self.n_facets)]))
+        failure_pattern = os.path.join(self.failure_dir, os.sep.join(['*' for _ in range(self.n_facets + 1)])) # +1 to account for failure type
         success_files = glob.glob(success_pattern)
         failure_files = glob.glob(failure_pattern)
 
@@ -202,11 +204,11 @@ class FileSystemAPI(OutputInterface):
         path = self._identifier_to_path(identifier, 'success')
         dr = os.path.dirname(path)
 
-        if not os.path.isdir(dr): #Should there be a case for if it does?
+        if not os.path.isdir(dr):
             os.makedirs(dr)
         open(path, 'w') #empty success file
 
-    @validate # could check error_type too
+    @validate
     def insert_failure(self, identifier, error_type):
         """
         Creates a result file using the identifier and error type passed
@@ -218,7 +220,7 @@ class FileSystemAPI(OutputInterface):
         path = self._identifier_to_path(identifier, error_type)
         dr = os.path.dirname(path)
 
-        if not os.path.isdir(dr): #Should there be a case for if it does?
-            os.makedirs(dr) #used to be os.path.dirname(path) 
+        if not os.path.isdir(dr):
+            os.makedirs(dr)
         with open(path, 'w') as writer:
             writer.write(f'{error_type} has occured!')

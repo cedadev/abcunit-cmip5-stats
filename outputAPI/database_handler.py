@@ -1,7 +1,7 @@
 import psycopg2
-#from handler_interface import OutputInterface
+from .handler_interface import OutputInterface
 
-class DataBaseAPI(object):
+class DataBaseAPI(OutputInterface):
 
     def __init__(self, connection_info, error_types, table_name='results'):
         """ 
@@ -50,8 +50,7 @@ class DataBaseAPI(object):
         self.cur.execute(query)
         if self.cur.rowcount > 0:
             return self.cur.fetchone()[0]
-        else:
-            return None
+        return None
 
     def get_all_results(self):
         """ 
@@ -118,7 +117,7 @@ class DataBaseAPI(object):
         f"WHERE id='{identifier}';"
         self.cur.execute(query)
         result = self.cur.fetchone()
-        if result != None:
+        if result is not None:
             return result[0] == 'success'
         return False
 
@@ -175,7 +174,7 @@ class DataBaseAPI(object):
         self.cur.execute(query)
         self.conn.commit()
 
-    def close_connection(self):
+    def close(self):
         """
         Close connection with the database
         """
