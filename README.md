@@ -84,7 +84,7 @@ For example, to calculate the mean of only 2 variables for in one model and ense
 
 The outputs - success files, failure files and resulting netCDF file if the job is successful are stored in directories with the following structure:
 
-`current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble/var_id.nc(.txt)`
+`current-directory/logs/output-type/stat/model/ensemble/var_id.nc(.txt)`
    
 * current-directory is the directory you are in when running the python scripts.
 * output-type can be one of:
@@ -96,4 +96,4 @@ The outputs - success files, failure files and resulting netCDF file if the job 
    
 The lotus outputs follow a similar pattern:
 
-`current-directory/ALL_OUTPUTS/output-type/stat/model/ensemble.out or ensemble.err`
+`current-directory/logs/output-type/stat/model/ensemble.out or ensemble.err`

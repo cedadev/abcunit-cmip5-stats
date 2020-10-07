@@ -103,5 +103,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-#outputs
-ALL_OUTPUTS/
+#logs
+logs/

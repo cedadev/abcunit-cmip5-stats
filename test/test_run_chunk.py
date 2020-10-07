@@ -21,7 +21,7 @@ def test_output_shape():
     ds = xr.open_dataset(fpath)
     assert ds.rh.shape == (145, 192)
 
-    cmd_delete = 'rm -r ALL_OUTPUTS'
+    cmd_delete = 'rm -r logs'
     subprocess.call(cmd_delete, shell=True)
 
 # test that valid data function fails if data is out of chosen range

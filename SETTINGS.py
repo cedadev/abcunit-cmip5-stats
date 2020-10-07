@@ -12,10 +12,10 @@ WALLCLOCK = '00:10'
 
 # Output path templates
 
-LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/ALL_OUTPUTS/lotus_outputs/{stat}/{model}"
+LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/logs/lotus_outputs/{stat}/{model}"
 OUTPUT_PATH_TMPL = "{GWS}/{USER}/abcunit-outputs"
-SUCCESS_DIR = "{current_directory}/ALL_OUTPUTS/success"
-FAILURE_DIR = "{current_directory}/ALL_OUTPUTS/failure"
+SUCCESS_DIR = "{current_directory}/logs/success"
+FAILURE_DIR = "{current_directory}/logs/failure"
 
 # choice for output handling
 
