@@ -1,5 +1,5 @@
 
-class OutputInterface(object):
+class BaseHandler(object):
     """ Ineterface class to define base methods for a result handler
     class which deals with the output of job results """
 

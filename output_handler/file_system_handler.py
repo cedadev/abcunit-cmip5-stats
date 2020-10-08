@@ -1,16 +1,15 @@
 import glob
 import os
-import numpy as np
 import functools
-from .handler_interface import OutputInterface
+from .base_handler import BaseHandler
 import SETTINGS
 
 
-class FileSystemAPI(OutputInterface):
+class FileSystemHandler(BaseHandler):
 
     def __init__(self, n_facets, sep, error_types):
         """ 
-        Constructs an instace of the file system handler api.
+        Constructs an instace of the file system handler.
         
         :param n_facets: (int) Number of directories used to define a job id
         :param sep: (str) Character used to separate facet names in a job id 

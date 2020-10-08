@@ -1,11 +1,11 @@
 import psycopg2
-from .handler_interface import OutputInterface
+from .base_handler import BaseHandler
 
-class DataBaseAPI(OutputInterface):
+class DataBaseHandler(BaseHandler):
 
     def __init__(self, connection_info, error_types, table_name='results'):
         """ 
-        Constructs an instace of the database handler api.
+        Constructs an instace of the database handler.
         
         :param connection_info: (str) Connection string in the psycopg2 format,
         "dbname=<db_name> user=<user_name> password=<password>".
