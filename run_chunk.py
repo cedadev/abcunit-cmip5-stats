@@ -6,11 +6,14 @@ all variables if none were provided."""
 
 import sys
 import os
+import pwd
 import glob
 import argparse
 import xarray as xr
 
 from lib import defaults
+from output_handler.database_handler import DataBaseHandler
+from output_handler.file_system_handler import FileSystemHandler
 import SETTINGS
 
 
@@ -151,6 +154,29 @@ def run_chunk(args):
 
     print(f"Completed job")
 
+def _get_results_handler(n_facets, sep, error_types):
+    """ 
+    Returns a result handler which either uses a database or the file system
+    depending on the SETTING.BACKEND.
+    If using a database make sure there is an environment variable called 
+    $ABCUNIT_DB_SETTINGS which is set to "dbname=<db_name> user=<user_name> host=<host_name> password=<password>".
+    
+    :param n_facets: (int) Number of facets used to define a unit.
+    :param sep: (str) Delimeter for facet separation
+    :param error_types: (list) List of the string names of the types of errors tat can occur.
+    """
+
+    if SETTINGS.BACKEND == 'db':
+        constring = os.environ.get("ABCUNIT_DB_SETTINGS")
+        if not constring:
+            raise KeyError('Please create environment variable ABCUNI_DB_SETTINGS'
+                            'in for format of "dbname=<db_name> user=<user_name>'
+                            'host=<host_name> password=<password>"')
+        return DataBaseHandler(constring, error_types)
+    elif SETTINGS.BACKEND == 'file':
+        return FileSystemHandler(n_facets, sep, error_types)
+    else:
+        raise ValueError('SETTINGS.BACKEND is not set properly')
 
 def run_unit(stat, model, ensemble, var_id):
     """
@@ -165,51 +191,33 @@ def run_unit(stat, model, ensemble, var_id):
     :return: txt or NetCDF file depending on success/ failure of the job.
     """
 
-    # define output file paths
+    sep = '.'
+    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace(os.sep, sep) # Model names contain a / annoyingly
+    n_facets = len(job_id.split(sep))
+    rh = _get_results_handler(n_facets, sep, ['bad_data', 'bad_num', 'no_output'])
+    
     current_directory = os.getcwd()  # get current working directory
+    user_name = pwd.getpwuid(os.getuid()).pw_name # get username of user who ran this code
 
+    #get path to send nc file results to
     output_path = SETTINGS.OUTPUT_PATH_TMPL.format(
-        current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
-    success_path = SETTINGS.SUCCESS_PATH_TMPL.format(
-        current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
-    bad_data_path = SETTINGS.BAD_DATA_PATH_TMPL.format(
-        current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
-    bad_num_path = SETTINGS.BAD_DATA_PATH_TMPL.format(
-        current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
-    no_output_path = SETTINGS.NO_OUTPUT_PATH_TMPL.format(
-        current_directory=current_directory, stat=stat, model=model, ensemble=ensemble)
+        GWS='/gws/nopw/j04/cedaproc', USER=user_name)
 
-    # check for success file - if exists - continue
-    success_file = f'{success_path}/{var_id}.nc.txt'
-
-    if os.path.exists(success_file):
+    #check if job has already been run successfully 
+    if rh.ran_succesfully(job_id):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
-        return 
+        return True
 
-    # delete previous failure files
-    bad_data_file = f'{bad_data_path}/{var_id}.nc.txt'
-    if os.path.exists(bad_data_file):
-        os.unlink(bad_data_file)
-
-    bad_num_file = f'{bad_num_path}/{var_id}.nc.txt'
-    if os.path.exists(bad_num_file):
-        os.unlink(bad_num_file)
-
-    no_output_file = f'{no_output_path}/{var_id}.nc.txt'
-    if os.path.exists(no_output_file):
-        os.unlink(no_output_file)
+    #delete failed result
+    rh.delete_result(job_id)
 
     # find files
     nc_files = find_files(model, ensemble, var_id)
 
     # check data is valid
     if not nc_files:
-
-        if not os.path.exists(bad_data_path):
-            os.makedirs(bad_data_path)
-
-        open(os.path.join(bad_data_path, f'{var_id}.nc.txt'), 'w')  # creates empty file
+        rh.insert_failure(job_id, 'bad_data')
 
         print(f'[ERROR] No valid files for {var_id}')
         return False
@@ -217,11 +225,9 @@ def run_unit(stat, model, ensemble, var_id):
     # check date range is valid
     validity = is_valid_range(nc_files)
     if not validity:
+        rh.insert_failure(job_id, 'bad_num')
 
-        if not os.path.exists(bad_num_path):
-            os.makedirs(bad_num_path)
-
-        open(os.path.join(bad_num_path, f'{var_id}.nc.txt'), 'w')
+        print(f'[ERROR] File date range is invalid for {var_id}')
         return False
 
     # calculate the statistic
@@ -237,19 +243,16 @@ def run_unit(stat, model, ensemble, var_id):
     if not os.path.exists(output_file):
         os.rmdir(output_path)
 
-        if not os.path.exists(no_output_path):
-            os.makedirs(no_output_path)
-
-        open(os.path.join(no_output_path, f'{var_id}.nc.txt'), 'w')
+        rh.insert_failure(job_id, 'no_output')
 
         print(f'[ERROR] Failed to generate output file: {output_path}/{var_id}.nc')
         return False
 
     # create success file
-    if not os.path.exists(success_path):
-        os.makedirs(success_path)
+    rh.insert_success(job_id)
 
-    open(os.path.join(success_path, f'{var_id}.nc.txt'), 'w')
+    rh.close()
+    return True
 
 
 def main():
