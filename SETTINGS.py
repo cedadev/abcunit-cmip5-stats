@@ -14,9 +14,12 @@ WALLCLOCK = '00:10'
 
 LOTUS_OUTPUT_PATH_TMPL = "{current_directory}/logs/lotus_outputs/{stat}/{model}"
 OUTPUT_PATH_TMPL = "{GWS}/{USER}/abcunit-outputs"
+
+LOG_BASE_DIR = "{current_directory}/logs"
+
 SUCCESS_DIR = "{current_directory}/logs/success"
 FAILURE_DIR = "{current_directory}/logs/failure"
 
 # choice for output handling
 
-BACKEND = 'db' #'db' or 'file'
+BACKEND = 'file' #'db' or 'file'

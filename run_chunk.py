@@ -167,14 +167,10 @@ def _get_results_handler(n_facets, sep, error_types):
     """
 
     if SETTINGS.BACKEND == 'db':
-        constring = os.environ.get("ABCUNIT_DB_SETTINGS")
-        if not constring:
-            raise KeyError('Please create environment variable ABCUNI_DB_SETTINGS'
-                            'in for format of "dbname=<db_name> user=<user_name>'
-                            'host=<host_name> password=<password>"')
-        return DataBaseHandler(constring, error_types)
+        return DataBaseHandler(error_types)
     elif SETTINGS.BACKEND == 'file':
-        return FileSystemHandler(n_facets, sep, error_types)
+        log_dir = SETTINGS.LOG_BASE_DIR.format(current_directory=os.getcwd())
+        return FileSystemHandler(log_dir, n_facets, sep, error_types)
     else:
         raise ValueError('SETTINGS.BACKEND is not set properly')
 
@@ -192,7 +188,7 @@ def run_unit(stat, model, ensemble, var_id):
     """
 
     sep = '.'
-    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace(os.sep, sep) # Model names contain a / annoyingly
+    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace(os.sep, sep)
     n_facets = len(job_id.split(sep))
     rh = _get_results_handler(n_facets, sep, ['bad_data', 'bad_num', 'no_output'])
     
