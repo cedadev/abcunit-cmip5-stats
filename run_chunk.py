@@ -12,8 +12,8 @@ import argparse
 import xarray as xr
 
 from lib import defaults
-from output_handler.database_handler import DataBaseHandler
-from output_handler.file_system_handler import FileSystemHandler
+from backend.database_handler import DataBaseHandler
+from backend.file_system_handler import FileSystemHandler
 import SETTINGS
 
 
