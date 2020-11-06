@@ -9,7 +9,7 @@ The name ABCunit corresponds to the 4 layers the workflow is split in to:
 3. C - chunk
 4. The Unit
 
-These scripts are an example of using the ABCUnit structure on CMIP5 data. This provides a repteable and efficient workflow.
+These scripts are an example of using the ABCUnit structure on CMIP5 data. This provides a repeatable and efficient workflow.
 
 The statistics that can be calculated are the maximum, minimum and mean.
 
@@ -33,7 +33,7 @@ The models, ensembles and variables available can be found in `lib/defaults.py`
 
 3. Run chunk script = `run_chunk.py`
 * Typically run on lotus but can be run from the command line
-* Calculates the statstic for the specified model, ensemble and variables
+* Calculates the statistic for the specified model, ensemble and variables
 * Statistic, model and ensemble must all be specified if run from the command line
 * Defaults to all variables
 * For each variable it: 
@@ -54,7 +54,7 @@ Log in to a JASMIN sci server:
 * `SETTINGS.py`
 * `setup-env.sh`
 
-Clone this repositroy and make sure you are in the top level abcunit-cmip5-stats directory:
+Clone this repository and make sure you are in the top level abcunit-cmip5-stats directory:
 
 * `https://github.com/cedadev/abcunit-cmip5-stats.git`
 * `cd abcunit-cmip5-stats`
@@ -126,4 +126,4 @@ If a job is successful, its corresponding netcdf4 file will be output to:
 
 `<gws>/<user>/abcunit-outputs/<var_id>.nc`
 
-Where `gws` is a path to a group workspace and `user` is your username. Netcdf4 files are output to a group workspace to more effectivley use storage space. 
+Where `gws` is a path to a group workspace and `user` is your username. Netcdf4 files are output to a group workspace to more effectively use storage space. 

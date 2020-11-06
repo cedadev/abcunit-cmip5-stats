@@ -23,7 +23,7 @@ def test_success_inserted():
 
 def test_ran_successfully():
     fs_handler.insert_success('mean.MOHC.HadGEM2-ES.r1i1p1.cWood')
-    assert(fs_handler.ran_succesfully('mean.MOHC.HadGEM2-ES.r1i1p1.cWood'))
+    assert(fs_handler.ran_successfully('mean.MOHC.HadGEM2-ES.r1i1p1.cWood'))
 
 def test_failure_inserted():
     fs_handler.insert_failure('mean.MOHC.HadGEM2-ES.r1i1p1.burntArea', 'bad_data')

@@ -28,7 +28,7 @@ def arg_parse_all():
     parser.add_argument('-s', '--stat', nargs=1, type=str, choices=stat_choices, required=True,
                         help=f'Type of statistic, must be one of: {stat_choices}', metavar='')
     parser.add_argument('-m', '--model', type=str, default=model_choices,
-                        help=f'Institue and model combination to run statistic on, '
+                        help=f'Institute and model combination to run statistic on, '
                              f'can be one or many of: {model_choices}. '
                              f'Default is all models.', metavar='', nargs='*')
     parser.add_argument('-e', '--ensemble', type=str, default=ensemble_choices,

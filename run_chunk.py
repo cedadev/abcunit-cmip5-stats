@@ -35,7 +35,7 @@ def arg_parse_chunk():
                         required=True, help=f'Type of statistic, must be one of: '
                                             f'{stat_choices}', metavar='')
     parser.add_argument('-m', '--model', nargs=1, type=str, choices=model_choices,
-                        required=True, help=f'Institue and model combination to run statistic on, '
+                        required=True, help=f'Institute and model combination to run statistic on, '
                                             f'must be one of: {model_choices}', metavar='')
     parser.add_argument('-e', '--ensemble', nargs=1, type=str, choices=ensemble_choices,
                         required=True, help=f'Ensemble to run statistic on, must be one of: '
@@ -200,7 +200,7 @@ def run_unit(stat, model, ensemble, var_id):
         GWS='/gws/nopw/j04/cedaproc', USER=user_name)
 
     #check if job has already been run successfully 
-    if rh.ran_succesfully(job_id):
+    if rh.ran_successfully(job_id):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
         return True
