@@ -114,7 +114,7 @@ def calculate_statistic(nc_files, var_id, stat):
     elif stat == 'max':
         result = dataset[var_id].max(dim='time', keep_attrs=True)
     elif stat == 'min':
-        result = dataset[var_id].max(dim='time', keep_attrs=True)
+        result = dataset[var_id].min(dim='time', keep_attrs=True)
 
     return result
 
