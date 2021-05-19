@@ -6,7 +6,7 @@ from run_all import arg_parse_all
 from run_batch import arg_parse_batch
 from run_chunk import arg_parse_chunk
 
-# check arguemnts are parsed correctly
+# check arguments are parsed correctly
 def test_good_args1():
     sys.argv = 'run_all.py -s mean'.split()
     args = arg_parse_all()

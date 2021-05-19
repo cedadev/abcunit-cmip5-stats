@@ -1,14 +1,13 @@
 import pytest
 import os
-from output_handler.database_handler import DataBaseHandler
+from backend.database_handler import DataBaseHandler
 
-CONNECTION_DETAILS = os.environ["ABCUNIT_DB_SETTINGS"]
 db_handler = None
 
 def setup_module():
     global db_handler
     print("SETTING UP")
-    db_handler = DataBaseHandler(CONNECTION_DETAILS, ['bad_data', 'bad_num', 'no_output'], 'test_results')
+    db_handler = DataBaseHandler(['bad_data', 'bad_num', 'no_output'], 'test_results')
     db_handler._delete_table()
     db_handler._create_table()
 
@@ -24,7 +23,7 @@ def test_success_inserted():
 
 def test_ran_successfully():
     db_handler.insert_success('mean/MOHC/HadGEM2-ES/r1i1p1/cWood')
-    assert(db_handler.ran_succesfully('mean/MOHC/HadGEM2-ES/r1i1p1/cWood'))
+    assert(db_handler.ran_successfully('mean/MOHC/HadGEM2-ES/r1i1p1/cWood'))
 
 def test_failure_inserted():
     db_handler.insert_failure('mean/MOHC/HadGEM2-ES/r1i1p1/burntArea', 'bad_data')

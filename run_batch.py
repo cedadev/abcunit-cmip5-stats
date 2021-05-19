@@ -7,7 +7,6 @@ all ensembles if none were provided."""
 
 import argparse
 import os
-#import xarray as xr
 import subprocess
 
 from lib import defaults
@@ -32,7 +31,7 @@ def arg_parse_batch():
                         required=True, help=f'Type of statistic, must be one of: '
                                             f'{stat_choices}', metavar='')
     parser.add_argument('-m', '--model', nargs=1, type=str, default=model_choices,
-                        required=True, help=f'Institue and model combination to run statistic on, '
+                        required=True, help=f'Institute and model combination to run statistic on, '
                                             f'must be one of: {model_choices}', metavar='')
     parser.add_argument('-e', '--ensemble', type=str, default=ensemble_choices,
                         help=f'Ensemble to run statistic on, can be one or many of: '

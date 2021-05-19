@@ -12,8 +12,8 @@ import argparse
 import xarray as xr
 
 from lib import defaults
-from output_handler.database_handler import DataBaseHandler
-from output_handler.file_system_handler import FileSystemHandler
+from backend.database_handler import DataBaseHandler
+from backend.file_system_handler import FileSystemHandler
 import SETTINGS
 
 
@@ -35,7 +35,7 @@ def arg_parse_chunk():
                         required=True, help=f'Type of statistic, must be one of: '
                                             f'{stat_choices}', metavar='')
     parser.add_argument('-m', '--model', nargs=1, type=str, choices=model_choices,
-                        required=True, help=f'Institue and model combination to run statistic on, '
+                        required=True, help=f'Institute and model combination to run statistic on, '
                                             f'must be one of: {model_choices}', metavar='')
     parser.add_argument('-e', '--ensemble', nargs=1, type=str, choices=ensemble_choices,
                         required=True, help=f'Ensemble to run statistic on, must be one of: '
@@ -167,14 +167,10 @@ def _get_results_handler(n_facets, sep, error_types):
     """
 
     if SETTINGS.BACKEND == 'db':
-        constring = os.environ.get("ABCUNIT_DB_SETTINGS")
-        if not constring:
-            raise KeyError('Please create environment variable ABCUNI_DB_SETTINGS'
-                            'in for format of "dbname=<db_name> user=<user_name>'
-                            'host=<host_name> password=<password>"')
-        return DataBaseHandler(constring, error_types)
+        return DataBaseHandler(error_types)
     elif SETTINGS.BACKEND == 'file':
-        return FileSystemHandler(n_facets, sep, error_types)
+        log_dir = SETTINGS.LOG_BASE_DIR.format(current_directory=os.getcwd())
+        return FileSystemHandler(log_dir, n_facets, sep, error_types)
     else:
         raise ValueError('SETTINGS.BACKEND is not set properly')
 
@@ -192,7 +188,7 @@ def run_unit(stat, model, ensemble, var_id):
     """
 
     sep = '.'
-    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace(os.sep, sep) # Model names contain a / annoyingly
+    job_id = f'{stat}/{model}/{ensemble}/{var_id}'.replace(os.sep, sep)
     n_facets = len(job_id.split(sep))
     rh = _get_results_handler(n_facets, sep, ['bad_data', 'bad_num', 'no_output'])
     
@@ -204,7 +200,7 @@ def run_unit(stat, model, ensemble, var_id):
         GWS='/gws/nopw/j04/cedaproc', USER=user_name)
 
     #check if job has already been run successfully 
-    if rh.ran_succesfully(job_id):
+    if rh.ran_successfully(job_id):
         print(f'[INFO] Already ran for {stat}, {model}, {ensemble}, {var_id}.'
               ' Success file found.')
         return True
